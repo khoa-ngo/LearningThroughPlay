@@ -1,4 +1,4 @@
-# An A.I. that can learn to perform robotics tasks from interacting with its environment
+# An A.I. that can learn to perform robotics tasks from its interaction with the physical world
 
 Requirements:
 * Python 3.5
@@ -8,7 +8,7 @@ Requirements:
 ```bash
 apt update
 apt upgrade
-pip install
+pip install bokeh
 ```
 
 # Installation
