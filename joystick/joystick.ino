@@ -1,4 +1,4 @@
-int potPin = 3;
+#define JOYSTICKX 2
 int val;
 
 void setup() {
@@ -8,7 +8,6 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  val = analogRead(potPin);
-  Serial.print("\nvalue: ");
-  Serial.print(val);
+  val = analogRead(JOYSTICKX);
+  Serial.println(val);
 }

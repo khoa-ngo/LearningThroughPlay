@@ -1,12 +1,12 @@
 import serial
 import sys
 import time
+import numpy as np
 
 "Serial Connection Configuration"
-SERIALPORT = "COM3"
+SERIALPORT = "COM4"
 baudrate = 9600
 
-act = 1
 
 def step(act):
     data = ""
@@ -17,6 +17,7 @@ def step(act):
     if data:
         return data
 
+
 try:
     ser = serial.Serial(SERIALPORT, baudrate)
 except serial.SerialException:
@@ -24,12 +25,12 @@ except serial.SerialException:
     sys.exit()
 
 while 1:
+    act = 0
+    time.sleep(0.1)
+    # Must check and clear serial stream before sending new ones
+    # Same for the Arduino side
     ob = step(act)
-
     if ob:
         ob = ob.decode('utf-8')
         ob = ob.split(",")
         print(ob)
-
-    act = act + 1
-    time.sleep(0.25)
