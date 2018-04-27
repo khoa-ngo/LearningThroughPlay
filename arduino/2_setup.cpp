@@ -18,12 +18,8 @@
 //Analog:
 #define JOYSTICKX 2 //Joystick signal, x direction
 #define POT 3 //Potentiometer Sense
-
-
-//Other Assignments:
-#define LED1 5 //LED Controller LED Location
-#define FORWARD 0
-#define REVERSE 1
+//Other:
+#define LED1 5 //LED Controller, RGB Channel
 
 //Initialization***
 //LED:
@@ -89,6 +85,6 @@ void setup() {
     Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
     while(1);
   }
-  delay(1000);  
+  delay(1000);
   bno.setExtCrystalUse(true);
 }

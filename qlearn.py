@@ -1,3 +1,4 @@
+#!/anaconda3/bin/python3.6
 import gym
 import numpy as np
 import random
@@ -17,17 +18,21 @@ goal_streak = 100  # number of episode successes before completion
 learning_rate = {'initial': 0.5, 'decay': 0.003, 'min': 0.01}
 exploration_rate = {'initial': 0.4, 'decay': 0.004, 'min': 0.001}
 discount_factor = 0.99  # the importance of future rewards
-# Discount factor of 0 makes the AI myopic (short-sighted) and 1 makes the AI strive for long term rewards.
-# In a sense, a lower discount factor means the AI's decision relies more on previous experience
-# while a higher discount factor means he/she relies more on new experiences
+# Discount factor of 0 makes the AI myopic (short-sighted) and 1 makes the AI
+# strive for long term rewards. In a sense, a lower discount factor means the
+# AI's decision relies more on previous experience while a higher discount
+# factor means he/she relies more on new experiences
 
 # Q-learning
-bins = np.array([[-0.4, -0.2, 0.0, 0.2, 0.4],  # defines the binning scheme applied to observations
+bins = np.array([[-0.4, -0.2, 0.0, 0.2, 0.4],  # defines the binning scheme
+# applied to observations
                 [-math.radians(50 / 2), math.radians(50 / 2)]],
                 dtype=object)
-bucket_size = (len(bins[0])+1, len(bins[1])+1)  # size of the binning buckets, differ for each observation types
+bucket_size = (len(bins[0])+1, len(bins[1])+1)  # size of the binning buckets,
+# differ for each observation types
 ac_space_size = env.action_space.n  # size of the action space
-Q_table = np.zeros(bucket_size + (ac_space_size,))  # initialize Q-table; q_table[angle, angular_velocity, action]
+Q_table = np.zeros(bucket_size + (ac_space_size,))  # initialize Q-table;
+# q_table[angle, angular_velocity, action]
 
 # Logging and Debug
 exploration_log = []
@@ -64,7 +69,8 @@ def learn():
             learned_value = reward + discount_factor * max_Q
             old_value = Q_table[state_previous + (action,)]
 
-            Q_table[state_previous + (action,)] += (learned_value - old_value) * learning_rate
+            Q_table[state_previous + (action,)] += (learning_rate *
+                                                (learned_value - old_value))
 
             # Setting up for the next iteration
             state_previous = state
@@ -162,6 +168,7 @@ def experiment(q_table_optimized):
         ob_space = ob_space[-2:]  # filter observations (angle, angular_velocity)
         state = bucketize(ob_space, bins)  # bin the observations
 
+
 def experiment_sample():
     env.reset()
     for episode in range(max_episodes):
@@ -169,7 +176,8 @@ def experiment_sample():
         action = env.action_space.sample()  # select action
         ob_space, reward, done, _ = env.step(action)
 
+
 if __name__ == "__main__":
     Q_table_learned = learn()  # extract final Q table from learning session
-    experiment(Q_table_learned)  # perform a benchmark run with the above Q table
+    # experiment(Q_table_learned)  # perform a benchmark run with the above Q table
     # experiment_sample()

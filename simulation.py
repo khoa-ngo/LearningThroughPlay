@@ -3,7 +3,7 @@ import numpy as np
 import random_search
 from bokeh.plotting import figure, show, output_file
 
-env = gym.make("CartPole-v1")
+env = gym.make("CartPole-v0")
 parameters = np.random.rand(4)
 
 num_of_episodes = 3
