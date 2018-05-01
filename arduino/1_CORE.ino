@@ -11,11 +11,18 @@ void updateObservation(float (& ob)[4], float position, float velocity, float an
   ob[3] = angular_velocity;
 }
 
-void sendSerial(float (& ob)[4], bool done) {
+void sendSerial(float (& ob)[4], int reward, bool done) {
   for (int i=0; i<=3; i++){
+    // observations
     Serial.print(ob[i], 4);
     Serial.print(',');
+
     if (i==3) {
+      // reward
+      Serial.print(reward);
+      Serial.print(',');
+
+      // done
       if (done){
         Serial.print('1');
       }
@@ -23,6 +30,9 @@ void sendSerial(float (& ob)[4], bool done) {
         Serial.print('0');
       }
       Serial.print(',');
+
+      // end of message, should be something like
+      // [ob1, ob2, ob3, ob4, reward, done]
       Serial.println();
     }
   }

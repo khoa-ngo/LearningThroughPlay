@@ -57,17 +57,17 @@ unsigned long time_delta;
 //Machine Learning:
 float ob[4];
 int reward = 0;
-bool done = true;
-int act = -1;
+int done = 1;
+int act = 3;
 
 //Other:
 bool active = false;
 bool debug = false;
-bool msg_received = true;
-bool manual_control = true;
+bool msg_received = false;
+bool manual_control = false;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(19200);
 
   //LED
   TLC.begin(); //LED Controller
@@ -83,12 +83,11 @@ void setup() {
   motorResetPosition(MOTOR_IN1, MOTOR_IN2, POT);
 
   //IMU
-  Serial.println("Orientation Sensor Test"); Serial.println("");
+  Serial.println("Initializing IMU"); Serial.println("");
   if(!bno.begin()) {
     /* There was a problem detecting the BNO055 ... check your connections */
     Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
-    while(1);
   }
-  delay(1000);  
+  delay(1000);
   bno.setExtCrystalUse(true);
 }

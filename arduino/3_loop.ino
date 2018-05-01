@@ -1,62 +1,57 @@
 void loop() {
+  // Read action from Python
   if (Serial.available()) {
-    String received = Serial.readStringUntil('\n'); // read action from Python
+    String received = Serial.readStringUntil('\n'); 
     act = received.toInt();
     msg_received = true;
-  }
-  else {
+    }
+    else {
     msg_received = false;
-  }
+    }
 
-  // LED
-  TLC.setLED(LED1, crop(r,0,4095), crop(g,0,4095), crop(b,0,4095));
-  TLC.write();
-  setLEDcolor(r, g, b, led_dir_r, led_dir_g, led_dir_b);
-  
-  //Joystick
-  if (manual_control){
-    act = readJoystick(JOYSTICKX);
+  // Check for done state First
+  if (getAngle() > 0.8 || getAngle() < -0.8 || 
+      readPosition(POT) > 0.8 || readPosition(POT) < 0.2 ) {
+    done = 1;
   }
-  
-  if (act != -1) {
-    active = true;
-  }
-
-  //Done Detection
-  if (angle > 0.85 || angle < -0.85) {
-    driveMotor(-1, 1, 0, position, MOTOR_IN1, MOTOR_IN2);
-    done = true;
-    active = false;
-    delay(500);
-  }
+  // Then Perform Action
   if (done) {
+    // Stop Motor
+    driveMotor(3, 0, 0, position, MOTOR_IN1, MOTOR_IN2);
+
+    // Reset Servo
     servo1.attach(SERVO1);
     servo2.attach(SERVO2);
     servoResetPosition();
-    delay(400);
-    // servoActivePosition();  # manual active mode for debug
+    delay(500);
+
+    // Send out 'done' message
     updateObservation(ob, 0.0, 0.0, 0.0, 0.0);
-    sendSerial(ob, done);
+    reward = 0;
+    sendSerial(ob, reward, done);
+
+    // Reset Pot Position
     done = motorResetPosition(MOTOR_IN1, MOTOR_IN2, POT);
-    delay(400);
+    delay(1000);
   }
-  else if (active) {
+  else if (act != 3) {
+    reward = 1;
     servo1.attach(SERVO1);
     servo2.attach(SERVO2);
     servoActivePosition();
-    driveMotor(act, 100, 0, position, MOTOR_IN1, MOTOR_IN2);
+    driveMotor(act, 85, 0, position, MOTOR_IN1, MOTOR_IN2);
   }
   else {
     servo1.detach();
     servo2.detach();
   }
   
-  if (msg_received && !done || manual_control) {
-    //Sensor: Slide Pot & IMU
+  if (msg_received){
+    // Observations
     angle = getAngle();
     position = readPosition(POT);
 
-    //Sensor: Calculated Values
+    // Calculated Observations
     time_now = millis();  //finish time
     time_delta = time_now - time_previous;
     velocity = 1000.0 * (position - position_previous)/((float)time_now-(float)time_previous);
@@ -65,10 +60,12 @@ void loop() {
     angle_previous = angle;
     time_previous = time_now;  //start time
 
-    //Send data to Python
     updateObservation(ob, position, velocity, angle, angular_velocity);
-    sendSerial(ob, done);
+    sendSerial(ob, reward, done);
   }
+
+  // servo1.detach();
+  // servo2.detach();
 
   //Debug
   if (debug){

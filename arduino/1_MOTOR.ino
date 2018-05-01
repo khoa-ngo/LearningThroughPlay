@@ -24,7 +24,7 @@ void driveMotor(int direction, int speed, int timegap, float x, int MOTOR_IN1, i
       digitalWrite(MOTOR_IN2, LOW);
     }
   }
-  if (direction == -1) {
+  if (direction == 3) {
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, LOW);
     delay(timegap);
@@ -34,7 +34,7 @@ void driveMotor(int direction, int speed, int timegap, float x, int MOTOR_IN1, i
 bool motorResetPosition(int MOTOR_IN1, int MOTOR_IN2, int POT) {
   float position;
   float delta_position = 1.0;
-  while(abs(delta_position) > 0.02) {
+  while(abs(delta_position) > 0.05) {
     position = readPosition(POT);
     delta_position = position - 0.5;
     if (delta_position > 0) {
@@ -44,6 +44,6 @@ bool motorResetPosition(int MOTOR_IN1, int MOTOR_IN2, int POT) {
       driveMotor(1, 70, 0, position, MOTOR_IN1, MOTOR_IN2);
     }
   }
-  driveMotor(-1, 30, 0, position, MOTOR_IN1, MOTOR_IN2);
-  return false;
+  driveMotor(3, 30, 0, position, MOTOR_IN1, MOTOR_IN2);
+  return 0;
 }
