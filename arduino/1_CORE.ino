@@ -3,8 +3,7 @@ int crop(int value, int min_value, int max_value) {
 }
 
 void updateObservation(float (& ob)[4], float position, float velocity, float angle, float angular_velocity) {
-  // Function takes in action and update observation
-//  float act = 1.0;
+  // takes in action and update observation
   ob[0] = position;
   ob[1] = velocity;
   ob[2] = angle;
@@ -14,9 +13,8 @@ void updateObservation(float (& ob)[4], float position, float velocity, float an
 void sendSerial(float (& ob)[4], int reward, bool done) {
   for (int i=0; i<=3; i++){
     // observations
-    Serial.print(ob[i], 4);
+    Serial.print(ob[i], 3);
     Serial.print(',');
-
     if (i==3) {
       // reward
       Serial.print(reward);
@@ -30,10 +28,17 @@ void sendSerial(float (& ob)[4], int reward, bool done) {
         Serial.print('0');
       }
       Serial.print(',');
-
-      // end of message, should be something like
-      // [ob1, ob2, ob3, ob4, reward, done]
       Serial.println();
     }
+  }
+}
+
+bool isDone(float angle, float position) {
+  if (angle < -0.8 || angle > 0.8 || 
+    position < 0.1 || position > 0.9) {
+    return true;
+  }
+  else {
+    return false;
   }
 }

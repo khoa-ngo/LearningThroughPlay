@@ -1,69 +1,120 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors as cl
 import csv
+import math
 
-def extract_observations(filename):
-    local_time = []
-    time = []
-    ob_space = []
-    reward = []
-    done = []
-    info = []
+
+def scatter_subplot(data, key, limit=False, dpi=250):
+    n = len(data['elapsed_time'])
+    a = len(key)
+    b = 1
+
+    fig = plt.figure(dpi=dpi, figsize=(7,17))  # aspect ratio of figure
+    # colors = cl.to_rgb(str(np.random.rand()))
+    colors = 'y'
+
+    # x = [i for i in data['elapsed_time']]
+    x = range(len(data['elapsed_time']))
+    c = 1
+    for k in key:
+        if len(key) >= 2:
+            fig.add_subplot(a,b,c)
+            c += 1
+        y = data[k]
+        plt.title(k, fontsize=12)
+        # plt.scatter(x, y, s=20, c=colors, alpha=0.5)
+        plt.bar(x, y, color=colors, linewidth=0)
+        plt.xticks(np.arange(0, n, step=100), fontsize=5)
+        plt.grid(which='major', color='k', linestyle='--', linewidth=0.25)
+        if k in limit:
+            plt.ylim(min(limit[k]), max(limit[k]))
+
+
+def combined_plot(data, key, limit=False, dpi=250):
+    n = len(data['elapsed_time'])  # length of data
+    fig = plt.figure(dpi=dpi)
+    colors = np.random.rand(n)
+    x = [i * 1000.0 for i in data['elapsed_time']]
+
+    for k in key:
+        y = data[k]
+        plt.title(k)
+        plt.plot(x, y)
+
+    if limit:
+        plt.ylim(min(limit[k]), max(limit[k]))
+
+
+def parse_data(filename):
+    headers = ['elapsed_time', 'act', 'observation0', 'observation1', 'observation2', 'observation3',
+               'reward', 'done', 'learning_rate', 'exploration_rate', 'episode', 'step']
+    data = {}
     with open(filename) as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
+        previous_angle = 0
         for row in reader:
-            if row:
-                local_time.append(row[0])
-                time.append(row[1])
-                ob_space.append([row[2], row[3], row[4], row[5]])
-                reward.append(row[6])
-                done.append(row[7])
-                info.append(row[8])
+            if not row:
+                continue
 
-    for j in range(len(ob_space)):
-        ob_space[j] = [float(i) for i in ob_space[j]]
+            for key in headers:
+                data_buffer = row[headers.index(key)]  # row[index]
+                if data_buffer == 'True':
+                    data_buffer = '1'
+                elif data_buffer == 'False':
+                    data_buffer = '0'
+                data.setdefault(key, [])
+                data[key].append(float(data_buffer))
 
-    ob_space = np.array(ob_space)
+            # key_custom1 = 'error'
+            # key_custom2 = 'observation3_predicted'
+            #
+            # delta_angle = 30.7 * (float(row[headers.index('observation2')]) - previous_angle)
+            # data.setdefault(key_custom1, [])
+            # error = delta_angle - float(row[headers.index('observation3')])
+            # data[key_custom1].append(float(error))
+            # previous_angle = float(row[headers.index('observation2')])
 
-    x = np.arange(len(time))
-    y1 = ob_space[:,2]  # 2: theta, 3: dtheta
-    y2 = ob_space[:,3]
-    colors = np.random.rand(len(time))
+            # data.setdefault(key_custom2, [])
+            # data[key_custom2].append(delta_angle)
 
-    return x, y1, y2, colors
+    return dict(data)
 
 
 if __name__ == "__main__":
-    # Main Plot
-    crop = 1
-    fig = plt.figure(dpi=250)
+    plot_setting = {"dpi": 280}
+    headers = ['elapsed_time', 'act', 'observation0', 'observation1', 'observation2', 'observation3',
+               'reward', 'done', 'learning_rate', 'exploration_rate', 'episode', 'step']
 
-    # Comparative
-    # filename = 'log.csv'
-    # x, y1, y2, colors= extract_observations(filename)
-    # fig.add_subplot(221)
-    # plt.title('Angle')
-    # plt.scatter(x, y1, s=1, c=colors, alpha=0.5)
-    # if crop: plt.ylim(-2.0, 2.0)
-    #
-    # fig.add_subplot(222)
-    # plt.title('Angular Velocity')
-    # plt.scatter(x, y2, s=1, c=colors, alpha=0.5)
-    # if crop: plt.ylim(-3.0, 3.0)
-    #
-    # filename = 'log_openai.csv'
-    # x, y1, y2, colors = extract_observations(filename)
-    # fig.add_subplot(223)
-    # plt.scatter(x, y1, s=1, c=colors, alpha=0.5)
-    # if crop: plt.ylim(-0.4, 0.4)
-    #
-    # fig.add_subplot(224)
-    # plt.scatter(x, y2, s=1, c=colors, alpha=0.5)
-    # if crop: plt.ylim(-1, 1)
-    # Ends
+    # plot experimental data
+    # log = parse_data('log.csv')
+    log = parse_data('log_openai.csv')
+    n = len(log['elapsed_time'])
 
-    #Diagnostics
-    filename = 'log.csv'
-    x, y1, y2, colors = extract_observations(filename)
+    # key = ['act', 'observation2', 'observation3', 'done']
+    key = headers
+    limit = {}
 
+    scatter_subplot(log, key, limit, dpi=plot_setting["dpi"])
+
+    plt.tight_layout()
+    # plt.tight_layout()
     plt.show()
+
+    # plot data from openai gym
+    # log_openai = parse_data('log_openai.csv')
+    # limit = {
+    #     'observation3': [-1.0, 1.0]
+    # }
+
+    # key = ['ob_space3', 'ob_space3_predicted']
+    # key = ['observation2', 'observation3', 'observation3_predicted', 'error']
+    # scatter_subplot(log, key, limit, dpi=plot_setting["dpi"])
+    # scatter_subplot(log_openai, key, limit, dpi=plot_setting["dpi"])
+
+    # plt.show()
+    # combined_plot(log_openai, key)
+
+    # print(np.mean([abs(number) for number in log_openai['observation3']]))
+    # print(np.mean([abs(number) for number in log_openai['observation3_predicted']]))
+

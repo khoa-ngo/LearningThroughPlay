@@ -1,73 +1,85 @@
 void loop() {
-  // Read action from Python
+  // read command from python
   if (Serial.available()) {
-    String received = Serial.readStringUntil('\n'); 
+    String received = Serial.readStringUntil('\n');
     act = received.toInt();
     msg_received = true;
-    }
-    else {
+  }
+  else {
     msg_received = false;
-    }
-
-  // Check for done state First
-  if (getAngle() > 0.8 || getAngle() < -0.8 || 
-      readPosition(POT) > 0.8 || readPosition(POT) < 0.2 ) {
-    done = 1;
   }
-  // Then Perform Action
-  if (done) {
-    // Stop Motor
-    driveMotor(3, 0, 0, position, MOTOR_IN1, MOTOR_IN2);
 
-    // Reset Servo
-    servo1.attach(SERVO1);
-    servo2.attach(SERVO2);
-    servoResetPosition();
-    delay(500);
-
-    // Send out 'done' message
-    updateObservation(ob, 0.0, 0.0, 0.0, 0.0);
-    reward = 0;
-    sendSerial(ob, reward, done);
-
-    // Reset Pot Position
-    done = motorResetPosition(MOTOR_IN1, MOTOR_IN2, POT);
-    delay(1000);
+  // reserved for debugging
+  if (debug) {
+    done = 0;
+    act = 2;
+    msg_received = true;
   }
-  else if (act != 3) {
-    reward = 1;
-    servo1.attach(SERVO1);
-    servo2.attach(SERVO2);
+
+  // perform action as soon as possible after receiving it
+  if (act != 2) {
     servoActivePosition();
-    driveMotor(act, 85, 0, position, MOTOR_IN1, MOTOR_IN2);
+    if (restarted){
+      delay(100);
+      restarted = false;
+    }
+    driveMotor(act, drive_speed, 15, position, MOTOR_IN1, MOTOR_IN2);
   }
   else {
     servo1.detach();
     servo2.detach();
   }
   
-  if (msg_received){
-    // Observations
-    angle = getAngle();
-    position = readPosition(POT);
+  // observation
+  delay(10);
+  angle = getAngle();
+  position = getPosition(POT);
+  // time_end = millis();  // clock ends
 
-    // Calculated Observations
-    time_now = millis();  //finish time
-    time_delta = time_now - time_previous;
-    velocity = 1000.0 * (position - position_previous)/((float)time_now-(float)time_previous);
-    angular_velocity = 1000.0 * (angle - angle_previous)/((float)time_now-(float)time_previous);
-    position_previous = position;
-    angle_previous = angle;
-    time_previous = time_now;  //start time
+  done = isDone(angle, position); // check if done
 
+  // calculated properties
+  // time_delta = time_end - time_begin;
+  velocity = (position - position_previous)/1.0;
+  angular_velocity = 10.0 * (angle - angle_previous)/1.0;
+  
+  position_previous = position;
+  angle_previous = angle;
+  // time_begin = millis();  // clock starts
+
+  // send data to python
+  if (!done && msg_received) {
+    reward = 1;  // receives reward if they hadn't fall
     updateObservation(ob, position, velocity, angle, angular_velocity);
     sendSerial(ob, reward, done);
   }
 
-  // servo1.detach();
-  // servo2.detach();
+  if (done) {
+    delay(200);
+    driveMotor(2, 1, 0, position, MOTOR_IN1, MOTOR_IN2); // stop motor
+    servo1.attach(SERVO1); // reset servo
+    servo2.attach(SERVO2); // reset servo
+    servoResetPosition(); // reset servo
+    delay(1000); // delay between servo reset and position reset
 
-  //Debug
+    // send out done null message
+    reward = 0; // assign reward
+    if (msg_received){
+      updateObservation(ob, 0.0, 0.0, 0.0, 0.0); // update null observations
+      sendSerial(ob, reward, done); // send message
+    }
+
+    // reset pot position
+    done = motorResetPosition(MOTOR_IN1, MOTOR_IN2, POT);
+    delay(1000);
+    restarted = true;
+    act = 2;
+
+    angle_previous = getAngle();  // get initial angle after reset
+    position_previous = getPosition(POT);  // get initial position after reset
+    // time_begin = millis();  // clock starts again
+  }
+
   if (debug){
     Serial.print("dt: ");
     Serial.print(time_delta);

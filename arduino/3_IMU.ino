@@ -1,6 +1,7 @@
 float getAngle() {
   sensors_event_t event;
   bno.getEvent(&event);
+  
   angle = event.orientation.x;
   if (angle > 300) {
     angle = (angle - 360)/30;
@@ -10,4 +11,3 @@ float getAngle() {
   }
   return angle;
 }
-
