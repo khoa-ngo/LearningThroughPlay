@@ -87,8 +87,8 @@ if __name__ == "__main__":
                'reward', 'done', 'learning_rate', 'exploration_rate', 'episode', 'step']
 
     # plot experimental data
-    # log = parse_data('log.csv')
-    log = parse_data('log_openai.csv')
+    log = parse_data('log.csv')
+    # log = parse_data('log_openai.csv')
     n = len(log['elapsed_time'])
 
     # key = ['act', 'observation2', 'observation3', 'done']

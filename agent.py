@@ -10,15 +10,24 @@ import atexit
 print("Initializing learning algorithm parameters...", end="  ", flush=True)
 # Environment Parameters
 max_episodes = 100 # maximum number of episodes to run the simulation
-max_steps = 200  # maximum number of steps per episode/epoch/generation
-steps_solved = 199  # number of steps to be considered solved
+max_steps = 100  # maximum number of steps per episode/epoch/generation
+steps_solved = max_steps-1  # number of steps to be considered solved
 goal_streak = 5  # number of episode successes before completion
 # Learning Parameters
 learning_rate_param = {'initial': 0.4, 'decay': 0.000, 'min': 0.00}  # default: 0.5, 0.003, 0.01
-exploration_rate_param = {'initial': 0.4, 'decay': 0.004, 'min': 0.001}  # default: 0.4, 0.004, 0.001
+exploration_rate_param = {'initial': 0.6, 'decay': 0.004, 'min': 0.001}  # default: 0.4, 0.004, 0.001
+
+# tried the following:
+# [0.4, 0.0, 0.0]; [0.4, 0.004, 0.001]; speed = 75
+# [0.4, 0.0, 0.0]; [0.8, 0.004, 0.001]; speed = 75
+# [0.4, 0.0, 0.0]; [1.8, 0.004, 0.001]; speed = 75
+# [0.4, 0.0, 0.0]; [0.4, 0.004, 0.001]; speed = 90
+# [0.4, 0.0, 0.0]; [0.4, 0.004, 0.001]; speed = 85
+# [0.4, 0.0, 0.0]; [0.6, 0.004, 0.001]; speed = 85
+
 discount_factor = 0.99  # the importance of future rewards
 # Q-learning
-bins = np.array([[-0.4, -0.2, 0.0, 0.2, 0.4],  # defines the binning scheme applied to observations
+bins = np.array([[-0.5, -0.25, 0.0, 0.25, 0.5],  # defines the binning scheme applied to observations
                  [-0.25, 0.25]],
                 dtype=object)
 bucket_size = (len(bins[0]) + 1, len(bins[1]) + 1)  # size of the binning buckets, differ for each observation types
@@ -111,7 +120,7 @@ def learn(Q_table):
 
         # Episode ends, check for number of streaks and update parameters
         if num_streaks >= goal_streak:
-            print("Episode %d finished after %f time steps with total reward %d" % episode, t, total_reward)
+            # print("Episode %d finished after %f time steps with total reward %d" % episode, t, total_reward)
             break
         exploration_rate = qlearn.get_exploration_rate(episode, exploration_rate_param)
         learning_rate = qlearn.get_learning_rate(episode, learning_rate_param)

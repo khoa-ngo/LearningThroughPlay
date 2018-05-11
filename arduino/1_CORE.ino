@@ -34,7 +34,7 @@ void sendSerial(float (& ob)[4], int reward, bool done) {
 }
 
 bool isDone(float angle, float position) {
-  if (angle < -0.8 || angle > 0.8 || 
+  if (angle < -0.75 || angle > 0.75 || 
     position < 0.1 || position > 0.9) {
     return true;
   }

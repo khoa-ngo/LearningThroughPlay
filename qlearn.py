@@ -13,10 +13,10 @@ import multiprocessing
 env = gym.make('CartPole-v1')
 
 # Environment Parameters
-max_episodes = 40 # maximum number of episodes to run the simulation
+max_episodes = 200 # maximum number of episodes to run the simulation
 max_steps = 100  # maximum number of steps per episode/epoch/generation
-steps_solved = 199  # number of steps to be considered solved
-goal_streak = 5  # number of episode successes before completion
+steps_solved = max_steps-1  # number of steps to be considered solved
+goal_streak = 1000  # number of episode successes before completion
 
 # Learning Parameters
 learning_rate_param = {'initial': 0.4, 'decay': 0.000, 'min': 0.00}  # default: 0.5, 0.003, 0.01

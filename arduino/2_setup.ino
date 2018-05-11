@@ -59,7 +59,8 @@ bool debug = false;
 bool msg_received = false;
 bool manual_control = false;
 bool restarted = true;
-int drive_speed = 80;
+int drive_speed = 85;
+int drive_delay = 15;
 
 void setup() {
   Serial.begin(38400);

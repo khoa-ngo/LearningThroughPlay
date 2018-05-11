@@ -23,7 +23,7 @@ void loop() {
       delay(100);
       restarted = false;
     }
-    driveMotor(act, drive_speed, 15, position, MOTOR_IN1, MOTOR_IN2);
+    driveMotor(act, drive_speed, drive_delay, position, MOTOR_IN1, MOTOR_IN2);
   }
   else {
     servo1.detach();
