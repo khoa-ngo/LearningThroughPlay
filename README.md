@@ -6,7 +6,7 @@ Requirements:
 
 # File Descriptions:
 ai_physical.py: perform training on a physical robot  
-ai_simulated.py: perform training on a simulated environment  
+ai_simulated.py: perform training in a simulated environment  
 core.py: contains core functions like logging, serial communication, etc.  
 qlearn.py: learning algorithm based on Q-learning   
 random_search.py: learning algorithm based on random search (aka. Monte Carlo method)   
