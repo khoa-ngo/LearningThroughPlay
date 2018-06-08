@@ -6,19 +6,11 @@ import csv
 def step(act, ser):
     time.sleep(0.01)
     data = ""  # clear data queue
-    string = '{}\n'.format(str(act))  # format to-be-sent data
-
-    # while ser.inWaiting()!=0:  # wait for incoming data
-    #     ser.flushOutput()
-    #     pass
-
+    string = '{}\n'.format(str(act))  # format outgoing data
     ser.write(string.encode())  # send data
-    # print('sent')
-    data = ser.readline()
+    data = ser.readline()  # read all data from serial port until nextline is detected
 
-    if data:
-        # print("got")
-        # print("")
+    if data:  # if there is data
         data = data.decode('utf-8')
         data = data.split(",")
         if isfloat(data[0]):

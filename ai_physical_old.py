@@ -1,10 +1,9 @@
 import time
-import timeit
 import serial
 import sys
 import numpy as np
 import core
-import qlearn
+import qlearn_old
 import atexit
 
 print("Initializing learning algorithm parameters...", end="  ", flush=True)
@@ -66,8 +65,8 @@ if log:
 def learn(Q_table):
     print("Learning session started")
     # Get initial learning parameters
-    learning_rate = qlearn.get_learning_rate(0, learning_rate_param)
-    exploration_rate = qlearn.get_exploration_rate(0, exploration_rate_param)
+    learning_rate = qlearn_old.get_learning_rate(0, learning_rate_param)
+    exploration_rate = qlearn_old.get_exploration_rate(0, exploration_rate_param)
 
     # Initial values
     num_streaks = 0
@@ -84,11 +83,11 @@ def learn(Q_table):
                                 action, observation, reward, done,
                                 learning_rate, exploration_rate, episode, 0)  # t=0 because this is initial time
         observation = observation[-2:]  # keep only angle & angular velocity
-        state_previous = qlearn.bucketize(observation, bins)  # output bucketized states
+        state_previous = qlearn_old.bucketize(observation, bins)  # output bucketized states
 
         for t in range(1, max_steps):
             # print("sending")
-            action = qlearn.select_action(state_previous, exploration_rate, Q_table)  # select action
+            action = qlearn_old.select_action(state_previous, exploration_rate, Q_table)  # select action
             observation, reward, done, _ = core.step(action, ser)  # perform action
 
             # log data
@@ -97,7 +96,7 @@ def learn(Q_table):
                                     learning_rate, exploration_rate, episode, t)
 
             observation = observation[-2:]  # filter observations (angle, angular_velocity)
-            state = qlearn.bucketize(observation, bins)  # bin the observations
+            state = qlearn_old.bucketize(observation, bins)  # bin the observations
 
             if t >= steps_solved:
                 num_streaks += reward
@@ -122,8 +121,8 @@ def learn(Q_table):
         if num_streaks >= goal_streak:
             # print("Episode %d finished after %f time steps with total reward %d" % episode, t, total_reward)
             break
-        exploration_rate = qlearn.get_exploration_rate(episode, exploration_rate_param)
-        learning_rate = qlearn.get_learning_rate(episode, learning_rate_param)
+        exploration_rate = qlearn_old.get_exploration_rate(episode, exploration_rate_param)
+        learning_rate = qlearn_old.get_learning_rate(episode, learning_rate_param)
 
     # Training ends
     core.step(2, ser)
