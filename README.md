@@ -1,4 +1,4 @@
-# An A.I. that can learn to perform robotics tasks from its interaction with the physical world
+# A.I. that can learn to perform robotic tasks from iteracting with the physical world
 
 Requirements:
 * Python 3.5
@@ -6,12 +6,12 @@ Requirements:
 
 # Install Dependencies:
 ```bash
-apt update
-apt upgrade
-pip install bokeh
+pip install gym, pandas, matplotlib, seaborn
 ```
 
 # Installation
 ```bash
 git clone https://github.com/khoa-ngo/ai_pendulum
+cd ai_pendulum
+./ai_simulated.py
 ```
