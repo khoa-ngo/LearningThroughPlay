@@ -34,7 +34,7 @@ discount_factor = 0.99  # The AI's patience for future rewards.
 
 
 def worker(unused):
-    ai = QLearn(environment_param)  # create an instance of the AI.
+    ai = QLearn(environment_param, logging=False)  # create an instance of the AI.
     q_table, episode_count = ai.train(environment, environment_param,
                                       learning_rate_param, exploration_rate_param,
                                       discount_factor)  # train the AI.
