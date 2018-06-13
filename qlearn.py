@@ -1,6 +1,8 @@
 import numpy as np
 import random
-
+import core
+import os
+import pandas as pd
 
 class QLearn:
     def __init__(self, env_param):
@@ -9,19 +11,35 @@ class QLearn:
         self.Q_table = np.zeros(self.bucket_size + (self.action_size,))
         self.num_streaks = 0  # number of consecutive episodes solved
         self.solved_episodes = 0  # number of episodes took to solve the problem
+        self.filename = 'ai_simulated_log.csv'
+        self.filepath = os.path.dirname(__file__) + "/" + self.filename
 
     def train(self, env, env_param, learning_rate_param, exploration_rate_param, discount_factor):
         self.learning_rate = self.get_learning_rate(learning_rate_param, env_param['goal_score'])
         self.exploration_rate = self.get_exploration_rate(exploration_rate_param, env_param['goal_score'])
+
+        if os.path.isfile(self.filepath):
+            os.remove(self.filepath)  # delete previous log file
+
         for episode in range(env_param['max_episodes']):
             env.reset()
             observation, reward, done, _ = env.step(env.action_space.sample())
+            data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, 0)]
+            columns = ['Position', 'Velocity', 'Angle', 'Angular Velocity', 'Reward', 'Done', 'Episode', 'Step']
+            dataframe = pd.DataFrame(data, columns=columns)
+            if os.path.isfile(self.filepath):
+                dataframe.to_csv(self.filename, index=False, mode='a', header=False)
+            else:
+                dataframe.to_csv(self.filename, index=False, mode='a', header=True)
             observation = observation[-2:]  # keep only angle & angular velocity
             state_previous = self.bucketize(observation, env_param['bins'])  # output bucketized states
 
             for t in range(env_param['max_steps']):
                 action = self.select_action(state_previous, self.exploration_rate, self.Q_table)  # select action
                 observation, reward, done, _ = env.step(action)  # perform action
+                data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, t+1)]
+                dataframe = pd.DataFrame(data, columns=columns)
+                dataframe.to_csv(self.filename, index=False, mode='a', header=False)
                 observation = observation[-2:]  # keep only angle & angular velocity
                 state = self.bucketize(observation, env_param['bins'])  # bin the observations
                 # Update Q-table based on the result
@@ -84,12 +102,10 @@ class QLearn:
         return action
 
     def get_learning_rate(self, param, expected_score, score=0):
-        rate = param['initial'] * (1-(score/expected_score))
-        return max(param['min'], rate)
+        return param['initial'] * (1-(score/expected_score))
 
     def get_exploration_rate(self, param, expected_score, score=0):
-        rate = param['initial'] * (1-(score/expected_score))
-        return max(param['min'], rate)
+        return param['initial'] * (1-(score/expected_score))
 
     def bucketize(self, ob_space, bins):
         bucket = np.empty(ob_space.size)
