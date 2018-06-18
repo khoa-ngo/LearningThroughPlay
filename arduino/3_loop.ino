@@ -1,8 +1,13 @@
 void loop() {
+  // explanation:
+  // action = 0, 1, or 2; drive left, drive right, no drive
+  // done = 0 or 1; environment not done, environment done
+  // 
+
   // read command from python
-  if (Serial.available()) {
+  if (Serial.available()) {  // if serial data is received
     String received = Serial.readStringUntil('\n');
-    act = received.toInt();
+    action = received.toInt();
     msg_received = true;
   }
   else {
@@ -10,20 +15,19 @@ void loop() {
   }
 
   // reserved for debugging
-  if (debug) {
-    done = 0;
-    act = 2;
-    msg_received = true;
-  }
+  #ifdef DEBUG
+  done = 0;
+  action = 2;
+  msg_received = true;
+  #endif
 
   // perform action as soon as possible after receiving it
-  if (act != 2) {
-    servoActivePosition();
+  if (action != 2) {
     if (restarted){
-      delay(100);
+      servoActivePosition();
       restarted = false;
     }
-    driveMotor(act, drive_speed, drive_delay, position, MOTOR_IN1, MOTOR_IN2);
+    driveMotor(action, drive_speed, drive_delay, position, MOTOR_IN1, MOTOR_IN2);
   }
   else {
     servo1.detach();
@@ -34,7 +38,7 @@ void loop() {
   delay(10);
   angle = getAngle();
   position = getPosition(POT);
-  // time_end = millis();  // clock ends
+   // time_end = millis();  // clock ends
 
   done = isDone(angle, position); // check if done
 
@@ -73,27 +77,27 @@ void loop() {
     done = motorResetPosition(MOTOR_IN1, MOTOR_IN2, POT);
     delay(1000);
     restarted = true;
-    act = 2;
+    action = 2;
 
     angle_previous = getAngle();  // get initial angle after reset
     position_previous = getPosition(POT);  // get initial position after reset
     // time_begin = millis();  // clock starts again
   }
 
-  if (debug){
-    Serial.print("dt: ");
-    Serial.print(time_delta);
-    Serial.print(" obs: ");
-    Serial.print(position, 3);
-    Serial.print(" ");
-    Serial.print(velocity, 3);
-    Serial.print(" ");
-    Serial.print(angle, 3);
-    Serial.print(" ");
-    Serial.print(angular_velocity, 4);
-    Serial.print(" act: ");
-    Serial.print(act);
-    Serial.print(" done: ");
-    Serial.println(done);
-  }
+  #ifdef DEBUG
+  Serial.print("dt: ");
+  Serial.print(time_delta);
+  Serial.print(" obs: ");
+  Serial.print(position, 3);
+  Serial.print(" ");
+  Serial.print(velocity, 3);
+  Serial.print(" ");
+  Serial.print(angle, 3);
+  Serial.print(" ");
+  Serial.print(angular_velocity, 4);
+  Serial.print(" action: ");
+  Serial.print(action);
+  Serial.print(" done: ");
+  Serial.println(done);
+  #endif
 }

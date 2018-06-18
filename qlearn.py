@@ -52,11 +52,9 @@ class QLearn:
                 state_previous = state  # setting up for the next iteration
                 if done:
                     self.num_streaks = 0
-                    # print("Episode %d finished after %f time steps, done" % (episode, t))
                     break
                 elif t >= env_param['goal_score']:
                     self.num_streaks += 1
-                    # print("Episode %d finished after %f time steps, done" % (episode, t))
                     break
             if self.num_streaks >= env_param['goal_streak'] or episode >= env_param['max_episodes'] - 1:
                 if self.num_streaks >= env_param['goal_streak']: # if the training was a success

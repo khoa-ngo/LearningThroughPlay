@@ -5,6 +5,7 @@
 #include "Adafruit_BNO055.h" // imu
 #include "utility/imumaths.h" // imu
 
+// #define DEBUG
 //digital pins assignments:
 #define DIN 4 //LED controller pin: DIN
 #define CLK 5 //LED controller pin: CLK
@@ -52,10 +53,9 @@ unsigned long time_delta;
 float ob[4];
 int reward = 0;
 int done = 1;
-int act = 2;
+int action = 2;
 
 //Other:
-bool debug = false;
 bool msg_received = false;
 bool manual_control = false;
 bool restarted = true;
@@ -64,7 +64,6 @@ int drive_delay = 15;
 
 void setup() {
   Serial.begin(38400);
-  // Serial.begin(9600);
 
   //LED
   TLC.begin(); //LED Controller
@@ -90,8 +89,8 @@ void setup() {
 
   position_previous = getPosition(POT);
 
-  if (debug) {
-    servo1.detach();
-    servo2.detach();
-  }
+  #ifdef DEBUG
+  servo1.detach();
+  servo2.detach();
+  #endif
 }

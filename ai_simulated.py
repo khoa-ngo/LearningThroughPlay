@@ -10,7 +10,7 @@ import pandas as pd
 
 # Create Simulated Environment and Define Environment Parameters:
 environment = gym.make('CartPole-v1')
-environment_param = {'max_episodes': 300, 'max_steps': 200, 'goal_score': 199, 'goal_streak': 10,
+environment_param = {'max_episodes': 300, 'max_steps': 200, 'goal_score': 199, 'goal_streak': 20,
                      'bins': np.array([[-0.2, -0.1, 0.0, 0.1, 0.2], [-0.5, 0.5]], dtype=object),
                      'action_size': environment.action_space.n}
 # An episode is an attempt to learn. Each episode consists of a number of timesteps. At each time step,
@@ -45,20 +45,19 @@ def worker(unused):
 if __name__ == '__main__':
     start_time = time.time()  # start stopwatch.
     batch_size = 1  # the desired number of training sessions.
-    # Train the AI in batches by running multiple simutaneous processes:
-    # This is done to speed up the simulation.
+    # train the AI in batches by running multiple simutaneous processes.
+    # this is done to speed up the simulation.
 
+    # Train the AI
     scoreboard = Manager().list()
     brain_bucket = Manager().list()
     listofzeros = [0] * batch_size
     with Pool(cpu_count()) as p:
         p.map(worker, listofzeros)
 
-
     # Results
     time_elapsed = time.time() - start_time
     success_rate = 100 * (1 - scoreboard.count(0) / len(scoreboard))
-
     print('scoreboard: {}'.format(scoreboard))
     print('average score: {:.2f}'.format(np.mean(scoreboard)))
     print('standard deviation: {:.2f}'.format(np.std(scoreboard)))
@@ -68,6 +67,8 @@ if __name__ == '__main__':
 
     # Data Visualization
     plot = True
+    render = True
+
     if plot:
         data1 = np.zeros((6, 3))
         data2 = np.zeros((6, 3))
@@ -101,8 +102,9 @@ if __name__ == '__main__':
         #             center=0)
         plt.show()
 
-    # Render
-    QLearn(environment_param).run_trial(environment, environment_param, brain_bucket[0])
-    # QLearn().run_dummy_trial(environment, environment_param)
+    if render:
+        QLearn(environment_param).run_trial(environment, environment_param, brain_bucket[0])
+        # for _ in range(3):
+        #     QLearn(environment_param, logging=False).run_dummy_trial(environment, environment_param)
 
     sys.exit()
