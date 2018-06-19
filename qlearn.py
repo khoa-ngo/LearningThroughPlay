@@ -20,10 +20,8 @@ class QLearn:
     def train(self, env, env_param, learning_rate_param, exploration_rate_param, discount_factor):
         self.learning_rate = self.get_learning_rate(learning_rate_param, env_param['goal_score'])
         self.exploration_rate = self.get_exploration_rate(exploration_rate_param, env_param['goal_score'])
-
-        if os.path.isfile(self.filepath):  # if previous log file exist
+        if self.logging and os.path.isfile(self.filepath):
             os.remove(self.filepath)  # delete previous log file
-
         for episode in range(env_param['max_episodes']):
             env.reset()
             observation, reward, done, _ = env.step(random.randint(0,1))
@@ -37,17 +35,17 @@ class QLearn:
                     dataframe.to_csv(self.filename, index=False, mode='a', header=True)
             observation = observation[-2:]  # keep only angle & angular velocity
             state_previous = self.bucketize(observation, env_param['bins'])  # output bucketized state
-            for t in range(env_param['max_steps']):
+            for step in range(env_param['max_steps']):
                 action = self.select_action(state_previous, self.exploration_rate, self.Q_table)  # select action
                 observation, reward, done, _ = env.step(action)  # perform action
                 if done:
                     self.num_streaks = 0
                     break
-                elif t >= env_param['goal_score']:
+                elif step >= env_param['goal_score']:
                     self.num_streaks += 1
                     break
                 if self.logging:
-                    data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, t+1)]
+                    data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, step+1)]
                     dataframe = pd.DataFrame(data, columns=columns)
                     dataframe.to_csv(self.filename, index=False, mode='a', header=False)
                 observation = observation[-2:]  # keep only angle & angular velocity
@@ -63,11 +61,8 @@ class QLearn:
                 else:
                     self.episode_count = 0  # if the training failed, return 0
                 break
-
-            self.exploration_rate = self.get_exploration_rate(exploration_rate_param,
-                                                              env_param['goal_score'], score=t)
-            self.learning_rate = self.get_learning_rate(learning_rate_param,
-                                                        env_param['goal_score'], score=t)
+            self.exploration_rate = self.get_exploration_rate(exploration_rate_param, env_param['goal_score'], score=step)
+            self.learning_rate = self.get_learning_rate(learning_rate_param, env_param['goal_score'], score=step)
         return self.Q_table, self.episode_count
 
     def run_trial(self, env, env_param, Q_table):
