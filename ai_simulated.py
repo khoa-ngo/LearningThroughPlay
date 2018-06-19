@@ -24,7 +24,7 @@ learning_rate_param = {'initial': 0.4}  # determines how much the AI learns from
 # higher learning rate means the AI learns a lot from new experiences, but also tend to forget past lessons.
 # lower learning rate means they learn slower, while remembering a lot of the past lessons.
 
-exploration_rate_param = {'initial': 0.3}  # the AI's tendency to try new things.
+exploration_rate_param = {'initial': 0.4}  # the AI's tendency to try new things.
 # higher exploration rate means the AI tend to diverge more and try newer things.
 # lower exploration rate means they tend to act based on only past experiences.
 
@@ -38,22 +38,28 @@ def worker(unused):
     q_table, episode_count = ai.train(environment, environment_param,
                                       learning_rate_param, exploration_rate_param,
                                       discount_factor)  # train the AI.
-    scoreboard.append(episode_count)  # store amount of trials the AI took to solve the problem.
-    brain_bucket.append(q_table)  # store the brain of the trained AI in form of the Q-table.
+    # scoreboard.append(episode_count)  # store amount of trials the AI took to solve the problem.
+    # brain_bucket.append(q_table)  # store the brain of the trained AI in form of the Q-table.
+    return episode_count, q_table
 
 
 if __name__ == '__main__':
     start_time = time.time()  # start stopwatch.
-    batch_size = 1  # the desired number of training sessions.
+    batch_size = 10  # the desired number of training sessions.
     # train the AI in batches by running multiple simutaneous processes.
     # this is done to speed up the simulation.
 
     # Train the AI
-    scoreboard = Manager().list()
-    brain_bucket = Manager().list()
+    scoreboard = list()
+    brain_bucket = list()
     listofzeros = [0] * batch_size
     with Pool(cpu_count()) as p:
-        p.map(worker, listofzeros)
+        results = p.map(worker, listofzeros)
+
+    for item in results:
+        scoreboard.append(item[0])
+        brain_bucket.append(item[1])
+
 
     # Results
     time_elapsed = time.time() - start_time
@@ -66,7 +72,7 @@ if __name__ == '__main__':
     # print('Q-tables: %s' % brain_bucket[0])
 
     # Data Visualization
-    plot = True
+    plot = False
     render = True
 
     if plot:

@@ -5,7 +5,7 @@
 #include "Adafruit_BNO055.h" // imu
 #include "utility/imumaths.h" // imu
 
-// #define DEBUG
+//#define DEBUG
 //digital pins assignments:
 #define DIN 4 //LED controller pin: DIN
 #define CLK 5 //LED controller pin: CLK
@@ -19,10 +19,10 @@
 #define POT 3 // potentiometer sense
 
 //other assignments:
-#define LED1 5 //LED Controller LED Location
+#define LED1 7 //LED Controller LED Location
 
 // initialize LED:
-Adafruit_TLC5947 TLC = Adafruit_TLC5947(1, CLK, DIN, LAT);
+Adafruit_TLC5947 TLC = Adafruit_TLC5947(0, CLK, DIN, LAT);
 int led_gap = 500; //time delay between the start of red, green, and blue LEDs
 int r = -200; // initial red value
 int g = r - led_gap; //initial green value with time delay
@@ -67,6 +67,7 @@ void setup() {
 
   //LED
   TLC.begin(); //LED Controller
+  TLC.setLED(LED1, 0, 0, 0);  // 0-4095
 
   //Servo
   servo1.attach(SERVO1); //Servo

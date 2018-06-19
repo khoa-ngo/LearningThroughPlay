@@ -3,6 +3,7 @@ import random
 import core
 import os
 import pandas as pd
+import random
 
 
 class QLearn:
@@ -25,7 +26,7 @@ class QLearn:
 
         for episode in range(env_param['max_episodes']):
             env.reset()
-            observation, reward, done, _ = env.step(env.action_space.sample())
+            observation, reward, done, _ = env.step(random.randint(0,1))
             if self.logging:
                 data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, 0)]
                 columns = ['Position', 'Velocity', 'Angle', 'Angular Velocity', 'Reward', 'Done', 'Episode', 'Step']
@@ -39,6 +40,12 @@ class QLearn:
             for t in range(env_param['max_steps']):
                 action = self.select_action(state_previous, self.exploration_rate, self.Q_table)  # select action
                 observation, reward, done, _ = env.step(action)  # perform action
+                if done:
+                    self.num_streaks = 0
+                    break
+                elif t >= env_param['goal_score']:
+                    self.num_streaks += 1
+                    break
                 if self.logging:
                     data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, t+1)]
                     dataframe = pd.DataFrame(data, columns=columns)
@@ -50,12 +57,6 @@ class QLearn:
                 old_value = self.Q_table[state_previous + (action,)]
                 self.Q_table[state_previous + (action,)] = (1-self.learning_rate)*old_value + self.learning_rate*(learned_value)
                 state_previous = state  # setting up for the next iteration
-                if done:
-                    self.num_streaks = 0
-                    break
-                elif t >= env_param['goal_score']:
-                    self.num_streaks += 1
-                    break
             if self.num_streaks >= env_param['goal_streak'] or episode >= env_param['max_episodes'] - 1:
                 if self.num_streaks >= env_param['goal_streak']: # if the training was a success
                     self.episode_count = episode  # return the number of trials the AI took to learn
@@ -84,7 +85,7 @@ class QLearn:
         env.reset()
         for _ in range(env_param['max_steps']):
             env.render()
-            action = env.action_space.sample()
+            action = random.randint(0,1)
             ob_space, reward, done, _ = env.step(action)
 
     def select_action(self, state, exploration, Q_table):

@@ -2,7 +2,6 @@ void loop() {
   // explanation:
   // action = 0, 1, or 2; drive left, drive right, no drive
   // done = 0 or 1; environment not done, environment done
-  // 
 
   // read command from python
   if (Serial.available()) {  // if serial data is received
