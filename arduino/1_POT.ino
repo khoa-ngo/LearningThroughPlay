@@ -1,26 +1,14 @@
 float getPosition(int POT) {
-  float val = 1 - analogRead(POT)*(1.0/1023.0);
-  return val;
+  return 1 - analogRead(POT)*(1.0/1023.0);
 }
 
-bool positionAtLow(float x) {
-  //x ranges from 0.0-1.0
-  float lowerlimit = 0.15;
-  if (x < lowerlimit) {
-    return 1;
+bool positionWithinRange(float position) {
+  float lower_limit = 0.15;  // position limits, trigger done if not within range
+  float upper_limit = 0.85;
+  if (position < upper_limit && position > lower_limit) {
+    return true;
   }
   else {
-    return 0;
-  }
-}
-
-bool positionAtHigh(float x) {
-  //0.0< x <1.0
-  float higherlimit = 0.85;
-  if (x > higherlimit) {
-    return 1;
-  }
-  else {
-    return 0;
+    return false;
   }
 }

@@ -1,10 +1,6 @@
 void loop() {
-  // explanation:
-  // action = 0, 1, or 2; drive left, drive right, no drive
-  // done = 0 or 1; environment not done, environment done
-
-  // read command from python
-  if (Serial.available()) {  // if serial data is received
+  // read command through serial comm
+  if (Serial.available()) {  // check serial buffer for command
     String received = Serial.readStringUntil('\n');
     action = received.toInt();
     msg_received = true;
@@ -12,77 +8,78 @@ void loop() {
   else {
     msg_received = false;
   }
-
   // reserved for debugging
   #ifdef DEBUG
-  done = 0;
+  done = false;
   action = 2;
   msg_received = true;
   #endif
-
+  // joystick control
+  if (joystick_control) {
+    ;
+  }
   // perform action as soon as possible after receiving it
   if (action != 2) {
     if (restarted){
       servoActivePosition();
       restarted = false;
     }
-    driveMotor(action, drive_speed, drive_delay, position, MOTOR_IN1, MOTOR_IN2);
+    driveMotor(action, drive_speed, position, MOTOR_IN1, MOTOR_IN2);
   }
   else {
     servo1.detach();
     servo2.detach();
   }
-  
   // observation
   delay(10);
   angle = getAngle();
   position = getPosition(POT);
-   // time_end = millis();  // clock ends
-
+  #ifdef DEBUG
+  time_end = millis();  // clock ends
+  #endif
   done = isDone(angle, position); // check if done
-
   // calculated properties
-  // time_delta = time_end - time_begin;
+  #ifdef DEBUG
+  time_delta = time_end - time_begin;
+  #endif
   velocity = (position - position_previous)/1.0;
   angular_velocity = 10.0 * (angle - angle_previous)/1.0;
-  
   position_previous = position;
   angle_previous = angle;
-  // time_begin = millis();  // clock starts
-
+  #ifdef DEBUG
+  time_begin = millis();  // clock starts
+  #endif
   // send data to python
   if (!done && msg_received) {
+    updateObservation(observation, position, velocity, angle, angular_velocity);
     reward = 1;  // receives reward if they hadn't fall
-    updateObservation(ob, position, velocity, angle, angular_velocity);
-    sendSerial(ob, reward, done);
+    sendSerial(observation, reward, done);
   }
-
   if (done) {
     delay(200);
-    driveMotor(2, 1, 0, position, MOTOR_IN1, MOTOR_IN2); // stop motor
-    servo1.attach(SERVO1); // reset servo
-    servo2.attach(SERVO2); // reset servo
+    stopMotor(position, MOTOR_IN1, MOTOR_IN2);
+    servo1.attach(SERVO1);
+    servo2.attach(SERVO2);
     servoResetPosition(); // reset servo
-    delay(1000); // delay between servo reset and position reset
-
+    delay(500); // delay between servo reset and position reset
     // send out done null message
-    reward = 0; // assign reward
     if (msg_received){
-      updateObservation(ob, 0.0, 0.0, 0.0, 0.0); // update null observations
-      sendSerial(ob, reward, done); // send message
+      updateObservation(observation, 0.00, 0.00, 0.00, 0.00); // update null observations
+      reward = 0; // assign reward
+      sendSerial(observation, reward, done); // send message
     }
-
     // reset pot position
     done = motorResetPosition(MOTOR_IN1, MOTOR_IN2, POT);
-    delay(1000);
+    delay(500);
     restarted = true;
-    action = 2;
-
     angle_previous = getAngle();  // get initial angle after reset
     position_previous = getPosition(POT);  // get initial position after reset
-    // time_begin = millis();  // clock starts again
+    #ifdef DEBUG
+    time_begin = millis();  // clock starts again
+    #endif
+    action = 2;
   }
-
+  // debug output
   #ifdef DEBUG
   Serial.print("dt: ");
   Serial.print(time_delta);

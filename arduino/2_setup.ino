@@ -19,7 +19,7 @@
 #define POT 3 // potentiometer sense
 
 //other assignments:
-#define LED1 7 //LED Controller LED Location
+#define LED1 5 //LED Controller LED Location
 
 // initialize LED:
 Adafruit_TLC5947 TLC = Adafruit_TLC5947(0, CLK, DIN, LAT);
@@ -50,24 +50,23 @@ unsigned long time_begin = millis(); //update previous timestamp for velocity ca
 unsigned long time_delta;
 
 //Machine Learning:
-float ob[4];
+float observation[4];
 int reward = 0;
-int done = 1;
+bool done = true;
 int action = 2;
 
 //Other:
 bool msg_received = false;
-bool manual_control = false;
+bool joystick_control = false;
 bool restarted = true;
 int drive_speed = 85;
-int drive_delay = 15;
 
 void setup() {
   Serial.begin(38400);
 
   //LED
   TLC.begin(); //LED Controller
-  TLC.setLED(LED1, 0, 0, 0);  // 0-4095
+  TLC.setLED(LED1, 4095, 4095, 4095);  // 0-4095
 
   //Servo
   servo1.attach(SERVO1); //Servo
