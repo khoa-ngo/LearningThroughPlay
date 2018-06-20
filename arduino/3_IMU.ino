@@ -11,14 +11,3 @@ float getAngle() {
   }
   return angle;
 }
-
-bool angleWithinRange(float angle) {
-  float lower_limit = -0.75;  // angular limits, trigger done if not within range
-  float upper_limit = 0.75;
-  if (angle < upper_limit && angle > lower_limit) {
-    return true;
-  }
-  else {
-    return false;
-  }
-}

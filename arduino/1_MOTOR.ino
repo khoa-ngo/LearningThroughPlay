@@ -1,20 +1,16 @@
 void driveMotor(int action, int speed, float position, int MOTOR_IN1, int MOTOR_IN2) {
   //action [0 or 1]
   //speed [0-inf]
+  float lower_limit = 0.15;  // position limits, trigger done if not within range
+  float upper_limit = 0.85;
   float speed_offset = 1.45;
-  if (action == 2) {  // action 2 shuts down motor
-    digitalWrite(MOTOR_IN1, LOW);
+  if (action == 0 && position > lower_limit) {
     digitalWrite(MOTOR_IN2, LOW);
+    analogWrite(MOTOR_IN1, speed);
   }
-  else if (positionWithinRange(position)) {
-    if (action == 0) {
-      digitalWrite(MOTOR_IN2, LOW);
-      analogWrite(MOTOR_IN1, speed);
-    }
-    if (action == 1) {
-      digitalWrite(MOTOR_IN1, LOW);
-      analogWrite(MOTOR_IN2, speed * speed_offset);
-    }
+  else if (action == 1 && position < upper_limit) {
+    digitalWrite(MOTOR_IN1, LOW);
+    analogWrite(MOTOR_IN2, speed * speed_offset);
   }
   else {
     digitalWrite(MOTOR_IN1, LOW);

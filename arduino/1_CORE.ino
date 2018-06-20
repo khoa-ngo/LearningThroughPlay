@@ -29,6 +29,28 @@ void sendSerial(float (& observation)[4], int reward, bool done) {
   }
 }
 
+bool positionWithinRange(float position) {
+  float lower_limit = 0.15;  // position limits, trigger done if not within range
+  float upper_limit = 0.85;
+  if (position < upper_limit && position > lower_limit) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+bool angleWithinRange(float angle) {
+  float lower_limit = -0.75;  // angular limits, trigger done if not within range
+  float upper_limit = 0.75;
+  if (angle < upper_limit && angle > lower_limit) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 bool isDone(float angle, float position) {
   if (positionWithinRange(position) && angleWithinRange(angle)){
     return false;
