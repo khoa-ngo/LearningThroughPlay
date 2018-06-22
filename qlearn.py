@@ -7,13 +7,13 @@ import random
 
 
 class QLearn:
-    def __init__(self, env_param, logging=False):
+    def __init__(self, env_param, logging=False, filename='ai_simulated_log.csv'):
         self.bucket_size = (len(env_param['bins'][0]) + 1, len(env_param['bins'][1]) + 1)
         self.action_size = env_param['action_size']
         self.Q_table = np.zeros(self.bucket_size + (self.action_size,))
         self.num_streaks = 0  # number of consecutive episodes solved
         self.solved_episodes = 0  # number of episodes took to solve the problem
-        self.filename = 'ai_simulated_log.csv'
+        self.filename = filename
         self.filepath = os.path.dirname(__file__) + "/" + self.filename  # path to log file
         self.logging = logging
 
@@ -38,16 +38,16 @@ class QLearn:
             for step in range(env_param['max_steps']):
                 action = self.select_action(state_previous, self.exploration_rate, self.Q_table)  # select action
                 observation, reward, done, _ = env.step(action)  # perform action
+                if self.logging:
+                    data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, step+1)]
+                    dataframe = pd.DataFrame(data, columns=columns)
+                    dataframe.to_csv(self.filename, index=False, mode='a', header=False)
                 if done:
                     self.num_streaks = 0
                     break
                 elif step >= env_param['goal_score']:
                     self.num_streaks += 1
                     break
-                if self.logging:
-                    data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, step+1)]
-                    dataframe = pd.DataFrame(data, columns=columns)
-                    dataframe.to_csv(self.filename, index=False, mode='a', header=False)
                 observation = observation[-2:]  # keep only angle & angular velocity
                 state = self.bucketize(observation, env_param['bins'])  # bin the observations
                 max_Q = np.amax(self.Q_table[state])  # update Q-table based on the result
