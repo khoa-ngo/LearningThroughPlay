@@ -3,12 +3,12 @@ void driveMotor(int action, int speed, float position, int MOTOR_IN1, int MOTOR_
   //speed [0-inf]
   float lower_limit = 0.15;  // position limits, trigger done if not within range
   float upper_limit = 0.85;
-  float speed_offset = 1.45;
-  if (action == 0 && position > lower_limit) {
+  float speed_offset = 1.25;
+  if (action == 0) {
     digitalWrite(MOTOR_IN2, LOW);
     analogWrite(MOTOR_IN1, speed);
   }
-  else if (action == 1 && position < upper_limit) {
+  else if (action == 1) {
     digitalWrite(MOTOR_IN1, LOW);
     analogWrite(MOTOR_IN2, speed * speed_offset);
   }
@@ -29,10 +29,10 @@ bool motorResetPosition(int MOTOR_IN1, int MOTOR_IN2, int POT) {
     position = getPosition(POT);
     delta_position = position - 0.5;
     if (delta_position > 0) {
-      driveMotor(0, 85, position, MOTOR_IN1, MOTOR_IN2);
+      driveMotor(0, 75, position, MOTOR_IN1, MOTOR_IN2);
     }
     if (delta_position < 0) {
-      driveMotor(1, 85, position, MOTOR_IN1, MOTOR_IN2);
+      driveMotor(1, 75, position, MOTOR_IN1, MOTOR_IN2);
     }
   }
   stopMotor(position, MOTOR_IN1, MOTOR_IN2);

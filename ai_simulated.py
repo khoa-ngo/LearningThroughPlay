@@ -10,7 +10,7 @@ import pandas as pd
 
 # Create Simulated Environment and Define Environment Parameters:
 environment = gym.make('CartPole-v1')
-environment_param = {'max_episodes': 300, 'max_steps': 200, 'goal_score': 199, 'goal_streak': 20,
+environment_param = {'max_episodes': 200, 'max_steps': 200, 'goal_score': 199, 'goal_streak': 20,
                      'bins': np.array([[-0.2, -0.1, 0.0, 0.1, 0.2], [-0.5, 0.5]], dtype=object),
                      'action_size': environment.action_space.n}
 # An episode is an attempt to learn. Each episode consists of a number of timesteps. At each time step,
@@ -34,7 +34,7 @@ discount_factor = 0.99  # The AI's patience for future rewards.
 
 
 def worker(unused):
-    ai = QLearn(environment_param, logging=False)  # create an instance of the AI.
+    ai = QLearn(environment_param, logging=True)  # create an instance of the AI.
     q_table, episode_count = ai.train(environment, environment_param,
                                       learning_rate_param, exploration_rate_param,
                                       discount_factor)  # train the AI.
@@ -45,7 +45,7 @@ def worker(unused):
 
 if __name__ == '__main__':
     start_time = time.time()  # start stopwatch.
-    batch_size = 10  # the desired number of training sessions.
+    batch_size = 1  # the desired number of training sessions.
     # train the AI in batches by running multiple simutaneous processes.
     # this is done to speed up the simulation.
 
@@ -53,13 +53,14 @@ if __name__ == '__main__':
     scoreboard = list()
     brain_bucket = list()
     listofzeros = [0] * batch_size
-    with Pool(cpu_count()) as p:
+    with Pool(1) as p:  # cpu_count()
         results = p.map(worker, listofzeros)
 
     for item in results:
         scoreboard.append(item[0])
         brain_bucket.append(item[1])
 
+    print(brain_bucket[0])
 
     # Results
     time_elapsed = time.time() - start_time
@@ -72,7 +73,7 @@ if __name__ == '__main__':
     # print('Q-tables: %s' % brain_bucket[0])
 
     # Data Visualization
-    plot = False
+    plot = True
     render = True
 
     if plot:
@@ -109,7 +110,8 @@ if __name__ == '__main__':
         plt.show()
 
     if render:
-        QLearn(environment_param).run_trial(environment, environment_param, brain_bucket[0])
+        pass
+        # QLearn(environment_param).run_trial(environment, environment_param, brain_bucket[0])
         # for _ in range(3):
         #     QLearn(environment_param, logging=False).run_dummy_trial(environment, environment_param)
 

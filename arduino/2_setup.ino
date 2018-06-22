@@ -52,7 +52,7 @@ unsigned long time_delta;
 //Machine Learning:
 float observation[4];
 int reward = 0;
-bool done = true;
+bool done = false;
 int action = 2;
 
 //Other:
@@ -62,11 +62,13 @@ bool restarted = true;
 int drive_speed = 85;
 
 void setup() {
-  Serial.begin(38400);
+  Serial.begin(57600);
+  String string = "hello";
+  Serial.println(string);
 
   //LED
-  TLC.begin(); //LED Controller
-  TLC.setLED(LED1, 4095, 4095, 4095);  // 0-4095
+  // TLC.begin(); //LED Controller
+  // TLC.setLED(LED1, 4095, 4095, 4095);  // 0-4095
 
   //Servo
   servo1.attach(SERVO1); //Servo
@@ -79,7 +81,6 @@ void setup() {
   motorResetPosition(MOTOR_IN1, MOTOR_IN2, POT);
 
   //IMU
-  Serial.println("Initializing IMU"); Serial.println("");
   if(!bno.begin()) {
     /* There was a problem detecting the BNO055 ... check your connections */
     Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
@@ -87,10 +88,6 @@ void setup() {
   delay(200);
   bno.setExtCrystalUse(true);
 
+  // update initial position
   position_previous = getPosition(POT);
-
-  #ifdef DEBUG
-  servo1.detach();
-  servo2.detach();
-  #endif
 }
