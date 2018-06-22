@@ -1,9 +1,9 @@
 void servoResetPosition() {
-  servo2.write(131); //Left, default: 130
-  servo1.write(34); //Right, default: 0
+  servo2.write(129); //Right, default: 130
+  servo1.write(34); //Left, default: 33
 }
 
 void servoActivePosition() {
-  servo2.write(0); //Left, default: 0
-  servo1.write(130); //Right, default: 130
+  servo2.write(10); //Right, default: 10
+  servo1.write(153); //Left, default: 153
 }
