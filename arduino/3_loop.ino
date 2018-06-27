@@ -10,16 +10,34 @@ void loop() {
         servoActivePosition();
         restarted = false;
       }
-      driveMotor(action, drive_speed, position, MOTOR_IN1, MOTOR_IN2);
+      // action
+      if (action == 1) {
+        drive_speed += drive_force;
+      }
+      if (action == 0) {
+        drive_speed -= drive_force;
+      }
+      // drive
+      if (drive_speed > 0) {
+        drive_direction = 1;
+      }
+      if (drive_speed < 0) {
+        drive_direction = 0;
+      }
+      else if (drive_speed == 0) {
+        drive_direction = 2;
+      }
+      driveMotor(drive_direction, abs(drive_speed), position, MOTOR_IN1, MOTOR_IN2);
+      // delay(5);
     }
 
     // observations
-    angle = getAngle();
+    angle = getAngle() - initial_angle;
     position = getPosition(POT);
     done = isDone(angle, position); // check if done
     // derived observations
-    velocity = (position - position_previous)*10.0;
-    angular_velocity = 10.0* (angle - angle_previous);
+    velocity = (position - position_previous) * 10.0;
+    angular_velocity = 10.0 * (angle - angle_previous);
     // store to last observations
     position_previous = position;
     angle_previous = angle;
@@ -27,6 +45,7 @@ void loop() {
     // send data to python
     if (done) {
       stopMotor(position, MOTOR_IN1, MOTOR_IN2);
+      drive_speed = 0;
       updateObservation(observation, position, velocity, angle, angular_velocity); // update null observations
       reward = 0; // assign reward
       sendSerial(action, observation, reward, done); // send out done null message
@@ -37,9 +56,10 @@ void loop() {
       // reset pot position
       delay(200);
       done = motorResetPosition(MOTOR_IN1, MOTOR_IN2, POT);
-      delay(700);
+      delay(1000);
+      initial_angle = getAngle();
       restarted = true;
-      angle_previous = getAngle();  // get initial angle after reset
+      angle_previous = 0.0;  // get initial angle after reset
       position_previous = getPosition(POT);  // get initial position after reset
     }
     else {

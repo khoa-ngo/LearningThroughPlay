@@ -42,8 +42,8 @@ bool positionWithinRange(float position) {
 }
 
 bool angleWithinRange(float angle) {
-  float lower_limit = -0.275;  // angular limits, trigger done if not within range
-  float upper_limit = 0.275;
+  float lower_limit = -0.3;  // angular limits, trigger done if not within range
+  float upper_limit = 0.3;
   if (angle < upper_limit && angle > lower_limit) {
     return true;
   }

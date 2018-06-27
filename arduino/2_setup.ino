@@ -37,6 +37,7 @@ Servo servo2;
 
 //IMU:
 Adafruit_BNO055 bno = Adafruit_BNO055(55);  // start ddafruit instance
+float initial_angle = 0.0;
 float angle = 0.0; // pendulum arm angle measurement
 float angle_previous = 0.0;
 float angular_velocity; // calculated angular velocity
@@ -59,7 +60,10 @@ int action = 2;
 bool msg_received = false;
 bool joystick_control = false;
 bool restarted = true;
-int drive_speed = 85;
+int drive_speed = 0;
+int drive_direction = 2;
+int drive_force = 5;
+
 
 void setup() {
   Serial.begin(57600);
