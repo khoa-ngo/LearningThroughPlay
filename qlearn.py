@@ -4,10 +4,11 @@ import core
 import os
 import pandas as pd
 import random
+import time
 
 
 class QLearn:
-    def __init__(self, env_param, logging=False, filename='ai_simulated_log.csv'):
+    def __init__(self, env_param, logging=False, telemetry=False, filename='ai_simulated_log.csv'):
         self.bucket_size = (len(env_param['bins'][0]) + 1, len(env_param['bins'][1]) + 1)
         self.action_size = env_param['action_size']
         self.Q_table = np.zeros(self.bucket_size + (self.action_size,))
@@ -16,6 +17,7 @@ class QLearn:
         self.filename = filename
         self.filepath = os.path.dirname(__file__) + "/" + self.filename  # path to log file
         self.logging = logging
+        self.telemetry = telemetry
 
     def train(self, env, env_param, learning_rate_param, exploration_rate_param, discount_factor):
         self.learning_rate = self.get_learning_rate(learning_rate_param, env_param['goal_score'])
@@ -24,10 +26,11 @@ class QLearn:
             os.remove(self.filepath)  # delete previous log file
         for episode in range(env_param['max_episodes']):
             env.reset()
-            observation, reward, done, _ = env.step(random.randint(0,1))
+            action = random.randint(0,1)
+            observation, reward, done, _ = env.step(action)
             if self.logging:
-                data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, 0)]
-                columns = ['Position', 'Velocity', 'Angle', 'Angular Velocity', 'Reward', 'Done', 'Episode', 'Step']
+                data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, 0, action)]
+                columns = ['Position', 'Velocity', 'Angle', 'Angular Velocity', 'Reward', 'Done', 'Episode', 'Step', 'Action']
                 dataframe = pd.DataFrame(data, columns=columns)
                 if os.path.isfile(self.filepath):
                     dataframe.to_csv(self.filename, index=False, mode='a', header=False)
@@ -36,17 +39,23 @@ class QLearn:
             observation = observation[-2:]  # keep only angle & angular velocity
             state_previous = self.bucketize(observation, env_param['bins'])  # output bucketized state
             for step in range(env_param['max_steps']):
+                starttime = time.time()
                 action = self.select_action(state_previous, self.exploration_rate, self.Q_table)  # select action
                 observation, reward, done, _ = env.step(action)  # perform action
                 if self.logging:
-                    data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, step+1)]
+                    data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, step+1, action)]
                     dataframe = pd.DataFrame(data, columns=columns)
                     dataframe.to_csv(self.filename, index=False, mode='a', header=False)
+                # print(str(time.time() - starttime))
                 if done:
                     self.num_streaks = 0
+                    if self.telemetry:
+                        print("episode: " + str(episode) + ", score: " + str(step))
                     break
                 elif step >= env_param['goal_score']:
                     self.num_streaks += 1
+                    if self.telemetry:
+                        print("episode: " + str(episode) + ", score: " + str(step))
                     break
                 observation = observation[-2:]  # keep only angle & angular velocity
                 state = self.bucketize(observation, env_param['bins'])  # bin the observations

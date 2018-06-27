@@ -10,7 +10,7 @@ class Environment:
     def __init__(self, serial_port, baudrate):
         self.serial_port = serial_port
         self.baudrate = baudrate
-        self.action_space = 1
+        self.action_size = 2
         try:
             self.ser = serial.Serial(self.serial_port, self.baudrate)
         except serial.SerialException:
@@ -21,11 +21,8 @@ class Environment:
 
     def step(self, act):
         string = '{}\n'.format(str(act))  # format outgoing data
-        # self.ser.flushInput()
         self.ser.write(string.encode())  # send data
-        print("sent: " + str(string.encode()))
         data = self.ser.readline()  # read all data from serial port until nextline is detected
-        print("got: " + str(data))
         if data:  # if there is data
             data = data.decode('utf-8')
             data = data.split(",")
