@@ -11,7 +11,7 @@ import pandas as pd
 # Create Simulated Environment and Define Environment Parameters:
 environment = gym.make('CartPole-v1')
 environment_param = {'max_episodes': 200, 'max_steps': 200, 'goal_score': 199, 'goal_streak': 20,
-                     'bins': np.array([[-0.2, -0.1, 0.0, 0.1, 0.2], [-0.5, 0.5]], dtype=object),
+                     'bins': np.array([[-0.2, -0.175, 0.0, 0.175, 0.2], [-0.2, 0.2]], dtype=object),
                      'action_size': environment.action_space.n}
 # An episode is an attempt to learn. Each episode consists of a number of timesteps. At each time step,
 # we can collect observations. Once an action is chosen and executed, we proceed to the next timestep,
@@ -20,11 +20,11 @@ environment_param = {'max_episodes': 200, 'max_steps': 200, 'goal_score': 199, '
 # The problem is considered solved when the AI solved 20 episodes consecutively.
 
 # Define Learning Parameters:
-learning_rate_param = {'initial': 0.4}  # determines how much the AI learns from new experiences.
+learning_rate_param = {'initial': 0.5}  # determines how much the AI learns from new experiences.
 # higher learning rate means the AI learns a lot from new experiences, but also tend to forget past lessons.
 # lower learning rate means they learn slower, while remembering a lot of the past lessons.
 
-exploration_rate_param = {'initial': 0.4}  # the AI's tendency to try new things.
+exploration_rate_param = {'initial': 0.3}  # the AI's tendency to try new things.
 # higher exploration rate means the AI tend to diverge more and try newer things.
 # lower exploration rate means they tend to act based on only past experiences.
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     # print('Q-tables: %s' % brain_bucket[0])
 
     # Data Visualization
-    plot = True
+    plot = False
     render = True
 
     if plot:
@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
     if render:
         pass
-        # QLearn(environment_param).run_trial(environment, environment_param, brain_bucket[0])
+        QLearn(environment_param).run_trial(environment, environment_param, brain_bucket[0])
         # for _ in range(3):
         #     QLearn(environment_param, logging=False).run_dummy_trial(environment, environment_param)
 
