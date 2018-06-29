@@ -29,8 +29,8 @@ class QLearn:
             action = random.randint(0,1)
             observation, reward, done, _ = env.step(action)
             if self.logging:
-                data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, 0, action)]
-                columns = ['Position', 'Velocity', 'Angle', 'Angular Velocity', 'Reward', 'Done', 'Episode', 'Step', 'Action']
+                data = [(action, observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, 0)]
+                columns = ['Action', 'Position', 'Velocity', 'Angle', 'Angular Velocity', 'Reward', 'Done', 'Episode', 'Step']
                 dataframe = pd.DataFrame(data, columns=columns)
                 if os.path.isfile(self.filepath):
                     dataframe.to_csv(self.filename, index=False, mode='a', header=False)
@@ -43,7 +43,7 @@ class QLearn:
                 action = self.select_action(state_previous, self.exploration_rate, self.Q_table)  # select action
                 observation, reward, done, _ = env.step(action)  # perform action
                 if self.logging:
-                    data = [(observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, step+1, action)]
+                    data = [(action, observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, step+1)]
                     dataframe = pd.DataFrame(data, columns=columns)
                     dataframe.to_csv(self.filename, index=False, mode='a', header=False)
                 # print(str(time.time() - starttime))
