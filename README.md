@@ -1,4 +1,4 @@
-## Artificial intelligence that can learn to perform robotic tasks from iteracting with the physical world
+## Artificial intelligence that can learn to perform robotic tasks from iteracting with the physical world (Work in Progress)
 
 ### Brief Overview:   
 * What is it about robots that make them so robotic?   
@@ -25,6 +25,7 @@ pip install gym, pandas, matplotlib, seaborn, pyserial
 Adafruit United Sensor > 1.0.2
 Adafruit TLC5947 > 1.0.2
 Adafruit BNO055 > 1.1.3
+Adafruit_VCNL4010 > 1.0.0
 ```
 
 ### Installation
