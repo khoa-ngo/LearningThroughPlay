@@ -1,4 +1,4 @@
-## Artificial intelligence that can learn to perform robotic tasks from iteracting with the physical world (Work in Progress)
+## Artificial intelligence that can learn to perform robotic tasks from iteracting with the physical world
 
 ### Brief Overview:   
 * What is it about robots that make them so robotic?   
