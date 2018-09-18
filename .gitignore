@@ -1,3 +1,6 @@
 __pycache__/
 .idea/
 *.csv
+ai_simulated_log.csv
+.idea/workspace.xml
+.idea/ai_pendulum.iml
