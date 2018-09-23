@@ -65,6 +65,8 @@ void balance()
   // as it is balancing, we know that the angle must be zero on
   // average, or we would fall over.
   angle = angle * 999 / 1000;
+  Serial.print(angle);
+  Serial.print('\t');
 
   // This variable measures how close we are to our basic
   // balancing goal - being on a trajectory that would cause us
@@ -77,7 +79,13 @@ void balance()
   // you can think of it as an angular estimate of how far off we
   // are from being balanced.
   int32_t risingAngleOffset = angleRate * ANGLE_RATE_RATIO + angle;
-  Serial.println(risingAngleOffset);
+  Serial.print(angleRate);
+  Serial.print('\t');
+  Serial.print(ANGLE_RESPONSE * risingAngleOffset / 100 / GEAR_RATIO);
+  Serial.println('\t');
+  // Serial.print(angleRate);
+  // Serial.print('\t');
+  // Serial.println(risingAngleOffset);
 
   // Combine risingAngleOffset with the distance and speed
   // variables, using the calibration constants defined in
@@ -197,8 +205,9 @@ void balanceUpdate()
   // Perform the balance updates at 100 Hz.
   if ((uint16_t)(ms - lastMillis) < UPDATE_TIME_MS) { return; }
   balanceUpdateDelayedStatus = ms - lastMillis > UPDATE_TIME_MS + 1;
-//  Serial.print("dt: ");
-//  Serial.println(ms-lastMillis);
+  // Serial.print(ms-lastMillis);
+  // Serial.print('\t');
+  // Serial.println(ms-lastMillis-5);
   lastMillis = ms;
 
   balanceUpdateSensors();
