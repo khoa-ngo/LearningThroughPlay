@@ -38,6 +38,7 @@ class QLearn:
                     dataframe.to_csv(self.filename, index=False, mode='a', header=True)
             observation = observation[-2:]  # keep only angle & angular velocity
             state_previous = self.bucketize(observation, env_param['bins'])  # output bucketized state
+
             for step in range(env_param['max_steps']):
                 starttime = time.time()
                 action = self.select_action(state_previous, self.exploration_rate, self.Q_table)  # select action

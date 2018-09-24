@@ -32,9 +32,13 @@ discount_factor = 0.99  # The AI's patience for future rewards.
 # higher discount factor makes the AI far-sighted, striving for long term rewards.
 # lower discount factor makes them myopic (short-sighted), settling for immediate/short-term rewards.
 
+# Data Visualization
+plot = True
+render = False
+
 
 def worker(unused):
-    ai = QLearn(environment_param, logging=True)  # create an instance of the AI.
+    ai = QLearn(environment_param, logging=False)  # create an instance of the AI.
     q_table, episode_count = ai.train(environment, environment_param,
                                       learning_rate_param, exploration_rate_param,
                                       discount_factor)  # train the AI.
@@ -60,8 +64,6 @@ if __name__ == '__main__':
         scoreboard.append(item[0])
         brain_bucket.append(item[1])
 
-    print(brain_bucket[0])
-
     # Results
     time_elapsed = time.time() - start_time
     success_rate = 100 * (1 - scoreboard.count(0) / len(scoreboard))
@@ -72,10 +74,6 @@ if __name__ == '__main__':
     print('--- {:.5f} seconds ---'.format(time_elapsed))
     # print('Q-tables: %s' % brain_bucket[0])
 
-    # Data Visualization
-    plot = False
-    render = True
-
     if plot:
         data1 = np.zeros((6, 3))
         data2 = np.zeros((6, 3))
@@ -85,33 +83,43 @@ if __name__ == '__main__':
                 data2[(i, j)] = brain_bucket[0][i][j][1]
         data_difference = data2 - data1
 
-        column = ['ob1-a', 'ob1-b', 'ob1-c']
-        index = ['ob2-a', 'ob2-b', 'ob2-c',
-                 'ob2-d', 'ob2-e', 'ob2-f']
+        column = ['0', '1', '2']
+        index = ['0', '1', '2',
+                 '3', '4', '5']
 
         data1 = pd.DataFrame(data1, index=index, columns=column)
         data2 = pd.DataFrame(data2, index=index, columns=column)
         data_difference = pd.DataFrame(data_difference, index=index, columns=column)
+        data_difference = np.sign(data_difference)
 
         plt.figure(dpi=200)
 
-        plt.subplot(1, 2, 1)
+        plt.subplot(1, 3, 1)
         sns.heatmap(data1, annot=True, linewidths=0.5,
                     robust=True, square=True,
                     cmap="RdPu", cbar=False)
-        plt.subplot(1, 2, 2)
+        plt.subplot(1, 3, 2)
         sns.heatmap(data2, annot=True, linewidths=0.5,
                     robust=True, square=True,
                     cmap="RdPu", cbar=False)
-        # sns.heatmap(np.sign(data_difference), annot=True, linewidths=0.5,
-        #             robust=False, square=True,
-        #             cmap="Spectral", cbar=True,
-        #             center=0)
+        plt.subplot(1, 3, 3)
+        sns.heatmap(data_difference, annot=True, linewidths=0.5,
+                    robust=False, square=True,
+                    cmap="Spectral", cbar=False,
+                    center=0)
         plt.show()
+        # output = open('qbrain.csv', 'wb')
+        # data_difference.dump(data1, output)
+        # output.close()
+        data_difference.to_csv('qbrain', index=False)
+        # np.save('qbrain', np.sign(data_difference))
+        # print(brain_bucket[0])
+        difference_brain = pd.read_csv('qbrain')
+        print(difference_brain)
 
     if render:
         pass
-        QLearn(environment_param).run_trial(environment, environment_param, brain_bucket[0])
+        QLearn(environment_param).run_trial(environment, environment_param, brain_bucket[-1])
         # for _ in range(3):
         #     QLearn(environment_param, logging=False).run_dummy_trial(environment, environment_param)
 

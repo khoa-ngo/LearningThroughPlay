@@ -197,8 +197,7 @@ void balanceUpdateSensors()
   integrateEncoders();
 }
 
-void balanceUpdate()
-{
+void balanceUpdate() {
   static uint16_t lastMillis;
   uint16_t ms = millis();
 
