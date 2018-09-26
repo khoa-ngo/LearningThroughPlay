@@ -26,11 +26,13 @@ class QLearn:
             os.remove(self.filepath)  # delete previous log file
         for episode in range(env_param['max_episodes']):
             env.reset()
-            action = random.randint(0,1)
+            action = random.randint(0, 1)
             observation, reward, done, _ = env.step(action)
             if self.logging:
-                data = [(action, observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, 0)]
-                columns = ['Action', 'Position', 'Velocity', 'Angle', 'Angular Velocity', 'Reward', 'Done', 'Episode', 'Step']
+                data = [(action, observation[0], observation[1], observation[2], observation[3], reward, int(done),
+                         episode + 1, 0)]
+                columns = ['Action', 'Position', 'Velocity', 'Angle', 'Angular Velocity', 'Reward', 'Done', 'Episode',
+                           'Step']
                 dataframe = pd.DataFrame(data, columns=columns)
                 if os.path.isfile(self.filepath):
                     dataframe.to_csv(self.filename, index=False, mode='a', header=False)
@@ -44,7 +46,8 @@ class QLearn:
                 action = self.select_action(state_previous, self.exploration_rate, self.Q_table)  # select action
                 observation, reward, done, _ = env.step(action)  # perform action
                 if self.logging:
-                    data = [(action, observation[0], observation[1], observation[2], observation[3], reward, int(done), episode+1, step+1)]
+                    data = [(action, observation[0], observation[1], observation[2], observation[3], reward, int(done),
+                             episode + 1, step + 1)]
                     dataframe = pd.DataFrame(data, columns=columns)
                     dataframe.to_csv(self.filename, index=False, mode='a', header=False)
                 # print(str(time.time() - starttime))
@@ -63,15 +66,17 @@ class QLearn:
                 max_Q = np.amax(self.Q_table[state])  # update Q-table based on the result
                 learned_value = reward + discount_factor * max_Q
                 old_value = self.Q_table[state_previous + (action,)]
-                self.Q_table[state_previous + (action,)] = (1-self.learning_rate)*old_value + self.learning_rate*(learned_value)
+                self.Q_table[state_previous + (action,)] = (1 - self.learning_rate) * old_value + self.learning_rate * (
+                    learned_value)
                 state_previous = state  # setting up for the next iteration
             if self.num_streaks >= env_param['goal_streak'] or episode >= env_param['max_episodes'] - 1:
-                if self.num_streaks >= env_param['goal_streak']: # if the training was a success
+                if self.num_streaks >= env_param['goal_streak']:  # if the training was a success
                     self.episode_count = episode  # return the number of trials the AI took to learn
                 else:
                     self.episode_count = 0  # if the training failed, return 0
                 break
-            self.exploration_rate = self.get_exploration_rate(exploration_rate_param, env_param['goal_score'], score=step)
+            self.exploration_rate = self.get_exploration_rate(exploration_rate_param, env_param['goal_score'],
+                                                              score=step)
             self.learning_rate = self.get_learning_rate(learning_rate_param, env_param['goal_score'], score=step)
         return self.Q_table, self.episode_count
 
@@ -90,21 +95,21 @@ class QLearn:
         env.reset()
         for _ in range(env_param['max_steps']):
             env.render()
-            action = random.randint(0,1)
+            action = random.randint(0, 1)
             ob_space, reward, done, _ = env.step(action)
 
     def select_action(self, state, exploration, Q_table):
-        if random.random() < exploration:
+        if random.random() < exploration or np.array_equal(Q_table[state], [0.0,0.0]):
             action = random.randint(0, 1)  # Select a random action
         else:
             action = np.argmax(Q_table[state])  # Select the action with the highest q
         return action
 
     def get_learning_rate(self, param, expected_score, score=0):
-        return param['initial'] * (1-(score/expected_score))
+        return param['initial'] * (1 - (score / expected_score))
 
     def get_exploration_rate(self, param, expected_score, score=0):
-        return param['initial'] * (1-(score/expected_score))
+        return param['initial'] * (1 - (score / expected_score))
 
     def bucketize(self, ob_space, bins):
         bucket = np.empty(ob_space.size)
