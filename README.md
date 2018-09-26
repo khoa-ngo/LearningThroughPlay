@@ -30,7 +30,7 @@ Balboa32U4 by Pololu version 1.0.1
 
 ### Installation
 ```bash
-git clone https://github.com/khoa-ngo/ai_pendulum
+git clone https://github.com/khoa-ngo/LearningThroughPlay
 ```
 
 ### Test Simulated Learning
