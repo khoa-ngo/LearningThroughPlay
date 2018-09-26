@@ -7,6 +7,7 @@ import sys
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import pickle
 
 # Create Simulated Environment and Define Environment Parameters:
 environment = gym.make('CartPole-v1')
@@ -34,7 +35,7 @@ discount_factor = 0.99  # The AI's patience for future rewards.
 
 # Data Visualization
 plot = True
-render = False
+render = True
 
 
 def worker(unused):
@@ -74,6 +75,32 @@ if __name__ == '__main__':
     print('--- {:.5f} seconds ---'.format(time_elapsed))
     # print('Q-tables: %s' % brain_bucket[0])
 
+    for item in brain_bucket[0]:
+        delta = np.sign(item[0][0]-item[0][1])
+        # print(delta)
+        # print('\n')
+
+    # Saving the Q-brain
+    qbrain = brain_bucket[0]
+    # print(qbrain)
+    output = open('qbrain.pkl', 'wb')
+    pickle.dump(qbrain, output)
+    output.close()
+
+    # Opening the Q-brain
+    pkl_file = open('qbrain.pkl', 'rb')
+    qbrain_loaded = pickle.load(pkl_file)
+    # print(data1)
+    pkl_file.close()
+
+    qbrain_difference = np.empty(qbrain.shape)
+    for i in range(6):
+        for j in range(3):
+            qbrain_difference[i][j][0] = qbrain[i][j][0] - qbrain[i][j][1]
+            qbrain_difference[i][j][1] = 0
+    # print(np.sign(qbrain_difference))
+    qbrain_difference = np.sign(qbrain_difference)
+
     if plot:
         data1 = np.zeros((6, 3))
         data2 = np.zeros((6, 3))
@@ -81,15 +108,12 @@ if __name__ == '__main__':
             for j in range(3):
                 data1[(i, j)] = brain_bucket[0][i][j][0]
                 data2[(i, j)] = brain_bucket[0][i][j][1]
-        data_difference = data2 - data1
 
-        column = ['0', '1', '2']
-        index = ['0', '1', '2',
-                 '3', '4', '5']
+        data_difference = data1 - data2
 
-        data1 = pd.DataFrame(data1, index=index, columns=column)
-        data2 = pd.DataFrame(data2, index=index, columns=column)
-        data_difference = pd.DataFrame(data_difference, index=index, columns=column)
+        data1 = pd.DataFrame(data1)
+        data2 = pd.DataFrame(data2)
+        data_difference = pd.DataFrame(data_difference)
         data_difference = np.sign(data_difference)
 
         plt.figure(dpi=200)
@@ -108,18 +132,15 @@ if __name__ == '__main__':
                     cmap="Spectral", cbar=False,
                     center=0)
         plt.show()
-        # output = open('qbrain.csv', 'wb')
-        # data_difference.dump(data1, output)
-        # output.close()
-        data_difference.to_csv('qbrain', index=False)
-        # np.save('qbrain', np.sign(data_difference))
-        # print(brain_bucket[0])
-        difference_brain = pd.read_csv('qbrain')
-        print(difference_brain)
+
+        # data_difference.to_csv('qbrain', index=False)
+
+        # difference_brain = pd.read_csv('qbrain')
 
     if render:
         pass
-        QLearn(environment_param).run_trial(environment, environment_param, brain_bucket[-1])
+        # print(qbrain_difference)
+        QLearn(environment_param).run_trial(environment, environment_param, qbrain_difference)
         # for _ in range(3):
         #     QLearn(environment_param, logging=False).run_dummy_trial(environment, environment_param)
 
