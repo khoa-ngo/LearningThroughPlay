@@ -8,7 +8,9 @@ In this project, we will teach a robot to learn and perform a simple athletic ta
 * Python 3.6.5
 * Arduino IDE > 1.8.5
 
-### File Descriptions:
+### File/Folder Descriptions:
+arduino: code uploaded to robot  
+processing: telemetry and visualization
 ai_physical.py: perform training on a physical robot  
 ai_simulated.py: perform training in a simulated environment  
 core.py: contains core functions like logging, serial communication, etc.  
@@ -18,19 +20,17 @@ random_search.py: learning algorithm based on random search (aka. Monte Carlo me
 ### Install Dependencies:
 * Python:
 ```bash
-pip install gym, pandas, matplotlib, seaborn, pyserial
+pip install gym, matplotlib, pandas, pickle, pyserial, seaborn
 ```   
-* Arduino: ([tutorial](https://www.arduino.cc/en/guide/libraries))
+* Arduino Libraries: ([tutorial](https://www.arduino.cc/en/guide/libraries))
 ```
-Adafruit United Sensor > 1.0.2
-Adafruit TLC5947 > 1.0.2
-Adafruit BNO055 > 1.1.3
-Adafruit_VCNL4010 > 1.0.0
+LSM6 by Pololu version 1.0.0
+Balboa32U4 by Pololu version 1.0.1
 ```
 
 ### Installation
 ```bash
-git clone https://github.com/khoa-ngo/ai_pendulum
+git clone https://github.com/khoa-ngo/LearningThroughPlay
 ```
 
 ### Test Simulated Learning
