@@ -3,7 +3,25 @@
 
 int32_t gYZero;
 int32_t angle; // millidegrees
+int bucketized_angle;
 int32_t angleRate; // degrees/s
+int bucketized_angleRate;
+int32_t qbrain_index[6][6] = \
+  {{11, 12, 13, 14, 15, 16}, \
+  {21, 22, 23, 24, 25, 26}, \
+  {31, 32, 33, 34, 35, 36}, \
+  {41, 42, 43, 44, 45, 46}, \
+  {51, 52, 53, 54, 55, 56}, \
+  {61, 62, 63, 64, 65, 66}};
+int32_t speed = 50;
+int32_t qbrain[6][6] = \
+  {{-400, -300, -200, -100, 10, 0}, \
+  {-300, -250, -100, 100, 200, 0}, \
+  {-300, -200, -100, 50, 150, 0}, \
+  {-300, -50, 50, 100, 250, 0}, \
+  {0, 0, 0, 0, 0, 0}, \
+  {0, 0, 0, 0, 0, 0}};
+int32_t action = 0;
 int32_t distanceLeft;
 int32_t speedLeft;
 int32_t driveLeft;
@@ -11,6 +29,7 @@ int32_t distanceRight;
 int32_t speedRight;
 int32_t driveRight;
 int16_t motorSpeed;
+int i;
 bool isBalancingStatus;
 bool balanceUpdateDelayedStatus;
 
@@ -54,6 +73,26 @@ void balanceSetup()
   gYZero = total / CALIBRATION_ITERATIONS;
 }
 
+void bucketize(int32_t angle, int32_t angleRate) {
+  if (angle < -10000) bucketized_angle = 0;
+  if (angle > -10000 && angle < -5000) bucketized_angle = 1;
+  if (angle > -5000 && angle < 0) bucketized_angle = 2;
+  if (angle > 0 && angle < 5000) bucketized_angle = 3;
+  if (angle > 5000 && angle < 10000) bucketized_angle = 1;
+  if (angle > 10000) bucketized_angle = 3;
+
+  if (angleRate < -300) bucketized_angleRate = 0;
+  if (angleRate > -100 && angleRate < -50) bucketized_angleRate = 1;
+  if (angleRate > -50 && angleRate < 0) bucketized_angleRate = 2;
+  if (angleRate > 0 && angleRate < 50) bucketized_angleRate = 3;
+  if (angleRate > 50 && angleRate < 100) bucketized_angleRate = 4;
+  if (angleRate > 300) bucketized_angleRate = 0;
+  // Serial.print(bucketized_angle);
+  // Serial.print('\t');
+  // Serial.print(bucketized_angleRate);
+  // Serial.print('\t');
+}
+
 // This function contains the core algorithm for balancing a
 // Balboa 32U4 robot.
 void balance()
@@ -65,8 +104,8 @@ void balance()
   // as it is balancing, we know that the angle must be zero on
   // average, or we would fall over.
   angle = angle * 999 / 1000;
-  Serial.print(angle);
-  Serial.print('\t');
+  // Serial.print(angle);
+  // Serial.print('\t');
 
   // This variable measures how close we are to our basic
   // balancing goal - being on a trajectory that would cause us
@@ -79,13 +118,31 @@ void balance()
   // you can think of it as an angular estimate of how far off we
   // are from being balanced.
   int32_t risingAngleOffset = angleRate * ANGLE_RATE_RATIO + angle;
-  Serial.print(angleRate);
-  Serial.print('\t');
-  Serial.print(ANGLE_RESPONSE * risingAngleOffset / 100 / GEAR_RATIO);
-  Serial.println('\t');
   // Serial.print(angleRate);
   // Serial.print('\t');
-  // Serial.println(risingAngleOffset);
+  // Serial.print(ANGLE_RESPONSE * risingAngleOffset / 100 / GEAR_RATIO);
+  // Serial.println('\t');
+
+  // Experimental AI
+  bucketize(angle, angleRate);
+  Serial.print(qbrain_index[bucketized_angle][bucketized_angleRate]);
+  // Serial.print(qbrain_index[2][2]);
+  Serial.print('\t');
+  // Serial.print(qbrain[bucketized_angle][bucketized_angleRate]/1000);
+  // Serial.print('\t');
+  Serial.print((angle*ANGLE_RESPONSE)/1000);
+  Serial.print('\t');
+  Serial.print((angleRate*ANGLE_RATE_RATIO*ANGLE_RESPONSE)/1000);
+  Serial.print('\t');
+  Serial.print(angle);
+  Serial.print('\t');
+  Serial.print(angleRate);
+  Serial.print('\t');
+  Serial.print(risingAngleOffset*ANGLE_RESPONSE/1000);
+  Serial.print('\t');
+  Serial.println(qbrain[bucketized_angle][bucketized_angleRate]);
+  // action = qbrain[angle][angleRate];
+  // Serial.println(action);
 
   // Combine risingAngleOffset with the distance and speed
   // variables, using the calibration constants defined in
@@ -93,15 +150,17 @@ void balance()
   // the new motor speed setting, the response is an amount that
   // is added to the motor speeds, since a *change* in speed is
   // what causes the robot to tilt one way or the other.
+  // motorSpeed += (
+  //   + ANGLE_RESPONSE * risingAngleOffset
+  //   + DISTANCE_RESPONSE * (distanceLeft + distanceRight)
+  //   + SPEED_RESPONSE * (speedLeft + speedRight)
+  //   ) / 100 / GEAR_RATIO;
+
   motorSpeed += (
-    + ANGLE_RESPONSE * risingAngleOffset
+    + qbrain[bucketized_angle][bucketized_angleRate]*1000
     + DISTANCE_RESPONSE * (distanceLeft + distanceRight)
     + SPEED_RESPONSE * (speedLeft + speedRight)
     ) / 100 / GEAR_RATIO;
-//  Serial.print("angle: ");
-//  Serial.print(angle);
-//  Serial.print(" rate: ");
-//  Serial.println(angleRate);
   
   if (motorSpeed > MOTOR_SPEED_LIMIT)
   {
