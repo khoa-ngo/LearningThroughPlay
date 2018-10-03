@@ -8,7 +8,7 @@
 // and 45:21 plastic gears, for an overall gear ratio of 111.
 // Adjust the ratio below to scale various constants in the
 // balancing algorithm to match your robot.
-const int16_t GEAR_RATIO = 111;
+const int16_t GEAR_RATIO = 111;  // default 111
 
 // This constant limits the maximum motor speed.  If your gear
 // ratio is lower than what we used, or if you are testing
@@ -17,7 +17,7 @@ const int16_t GEAR_RATIO = 111;
 //
 // If you want to use speeds faster than 300, you should add
 // the line "motors.allowTurbo(true);" to setup().
-const int16_t MOTOR_SPEED_LIMIT = 300;
+const int16_t MOTOR_SPEED_LIMIT = 300;  // default 300
 
 // This constant relates the angle to its rate of change for a
 // robot that is falling from a nearly-vertical position or
@@ -28,7 +28,7 @@ const int16_t MOTOR_SPEED_LIMIT = 300;
 // has fallen by 90 degrees it will be moving at about
 // 90,000/140 = 642 deg/s.  See the end of Balancer.ino for one
 // way to calibrate this value.
-const int16_t ANGLE_RATE_RATIO = 250;  //default 140
+const int16_t ANGLE_RATE_RATIO = 160;  //default 140
 
 // The following three constants define a PID-like algorithm for
 // balancing.  Each one determines how much the motors will
@@ -58,7 +58,7 @@ const int16_t ANGLE_RESPONSE = 11;  // default 11
 // forwards.  When this constant is adjusted properly, the robot
 // will no longer zoom off in one direction, but it will drive
 // back and forth a few times before falling down.
-const int16_t DISTANCE_RESPONSE = 63; //default 73
+const int16_t DISTANCE_RESPONSE = 73; //default 73
 
 // DISTANCE_DIFF_RESPONSE determines the response to differences
 // between the left and right motors, preventing undesired

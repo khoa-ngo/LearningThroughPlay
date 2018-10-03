@@ -108,7 +108,7 @@ void standUp()
   {
     delay(UPDATE_TIME_MS);
     balanceUpdateSensors();
-    if(angle < 60000)
+    if(angle < 30000)
     {
       break;
     }
