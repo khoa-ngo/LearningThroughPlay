@@ -2,7 +2,6 @@ import logging
 import os
 import tempfile
 import numpy as np
-
 import gym
 
 
@@ -18,16 +17,16 @@ class EpisodicAgent(object):
 
     def __init__(self, action_space):
         self.action_space = action_space
-        assert isinstance(action_space, gym.spaces.discrete.Discrete), 'unsupported action space for now.'
+        # assert isinstance(action_space, gym.spaces.discrete.Discrete), 'unsupported action space for now.'
 
         # options
         self.epsilon = 1.0  # probability of choosing a random action
-        self.epsilon_decay = 0.985  # decay of epsilon per episode
+        self.epsilon_decay = 0.98  # decay of epsilon per episode
         self.epsilon_min = 0
-        self.nnfind = 500  # how many nearest neighbors to consider in the policy?
+        self.nnfind = 60  # how many nearest neighbors to consider in the policy?
         self.mem_needed = 500  # amount of data to have before we can start exploiting
         self.mem_size = 50000  # maximum size of memory
-        self.gamma = 0.95  # discount factor
+        self.gamma = 0.98  # discount factor
         self.expectation = 200
 
         # internal vars
@@ -40,8 +39,8 @@ class EpisodicAgent(object):
         self.dbv = {}  # value function at all steps, computed retrospectively
         self.ep_start_pointer = 0
 
-    def act(self, observation, reward, last_episode_reward, done):
-        assert isinstance(observation, np.ndarray) and observation.ndim == 1, 'unsupported observation type for now.'
+    def act(self, observation, reward, done, happiness):
+        # assert isinstance(observation, np.ndarray) and observation.ndim == 1, 'unsupported observation type for now.'
 
         if self.db is None:
             # lazy initialization of memory
@@ -76,8 +75,8 @@ class EpisodicAgent(object):
 
         else:
             # explore: do something random
-            a = self.action_space.sample()
-
+            # a = self.action_space.sample()
+            a = (np.random.rand()-0.5)*2
         # record move to database
         if self.mem_pointer < self.mem_size:
             self.db[self.mem_pointer] = observation  # save the state
@@ -98,7 +97,9 @@ class EpisodicAgent(object):
             self.max_pointer = min(max(self.max_pointer, self.mem_pointer), self.mem_size)
 
             # decay exploration probability
-            self.epsilon *= self.epsilon_decay
+            self.epsilon *= (self.epsilon_decay + 1-(happiness / self.expectation)) / 2
+            print('epsilon: %f\tnew epsilon: %f' % (self.epsilon, 1-(happiness / self.expectation)))
+
             self.epsilon = max(self.epsilon, self.epsilon_min)  # cap at epsilon_min
 
             # print('memory size: ', self.mem_pointer)
