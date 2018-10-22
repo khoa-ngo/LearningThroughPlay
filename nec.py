@@ -74,9 +74,8 @@ class EpisodicAgent(object):
             a = its[0][1]
 
         else:
-            # explore: do something random
-            # a = self.action_space.sample()
-            a = (np.random.rand()-0.5)*2
+            a = self.action_space.sample()
+
         # record move to database
         if self.mem_pointer < self.mem_size:
             self.db[self.mem_pointer] = observation  # save the state
