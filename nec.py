@@ -88,7 +88,6 @@ class EpisodicAgent(object):
         self.iter += 1
 
         if done:  # episode Ended;
-
             # compute the estimate of the value function based on this rollout
             v = 0
             for t in reversed(range(self.ep_start_pointer, self.mem_pointer)):
@@ -102,8 +101,7 @@ class EpisodicAgent(object):
             self.epsilon *= self.epsilon_decay
             self.epsilon = max(self.epsilon, self.epsilon_min)  # cap at epsilon_min
 
-            print('memory size: ', self.mem_pointer)
-
+            # print('memory size: ', self.mem_pointer)
         return a
 
 
@@ -135,21 +133,8 @@ if __name__ == '__main__':
                 last_episode_reward = sum_reward_running
                 break
         sum_reward_running = sum_reward_running * 0.95 + sum_reward * 0.05
-        print('%d running reward: %f\treward: %f' % (i, sum_reward_running, sum_reward))
-
-    reward = 0
-    done = False
-    for l in range(5):
-        ob = env.reset()
-        ob = ob[2:]
-        sum_reward = 0
-        for k in range(300):
-            env.render()
-            action = agent.act(ob, 0, last_episode_reward, done)
-            ob, reward, done, _ = env.step(action)
-            ob = ob[2:]
-            sum_reward += reward
-        print('%d reward: %f' % (i, sum_reward))
+        # print('%d running reward: %f\treward: %f' % (i, sum_reward_running, sum_reward))
+        # print('%d\treward: %f' % (i, sum_reward))
 
     # Dump monitor info to disk
     # env.monitor.close()
