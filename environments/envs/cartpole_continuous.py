@@ -54,7 +54,8 @@ class CartPoleEnv(gym.Env):
         self.total_mass = (self.masspole + self.masscart)
         self.length = 0.12  # actually half the pole's length
         self.polemass_length = (self.masspole * self.length)
-        self.force_mag = 0.04 * self.total_mass
+        self.force_scalar = 140
+        self.force_mag = 0.04 * self.total_mass * self.force_scalar
         self.tau = 0.01  # seconds between state updates
         self.kinematics_integrator = 'euler'
 
@@ -85,8 +86,8 @@ class CartPoleEnv(gym.Env):
     def step(self, action):
         state = self.state
         x, x_dot, theta, theta_dot = state
-        # force = self.force_mag if action == 1 else -self.force_mag
-        force = action * self.force_mag
+        force = self.force_mag if action == 1 else -self.force_mag
+        # force = action * self.force_mag
         costheta = math.cos(theta)
         sintheta = math.sin(theta)
         temp = (force + self.polemass_length * theta_dot * theta_dot * sintheta) / self.total_mass
@@ -127,9 +128,11 @@ class CartPoleEnv(gym.Env):
         return np.array(self.state_filtered), reward, done, {}
 
     def reset(self):
-        self.state = np.array([0, 0, 0.12493066785, 1.53588974176])
-        self.state_filtered = (0, 0, 0.12493066785 / (2 * math.pi / 360), 1.53588974176 / (2 * math.pi / 360))
+        # self.state = np.array([0, 0, 0.12493066785, 1.53588974176])
+        # self.state_filtered = (0, 0, 0.12493066785 / (2 * math.pi / 360), 1.53588974176 / (2 * math.pi / 360))
         # self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
+        self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
+        self.state_filtered = (0, 0, 0.12493066785 / (2 * math.pi / 360), 1.53588974176 / (2 * math.pi / 360))
         self.steps_beyond_done = None
         return np.array(self.state_filtered)
 

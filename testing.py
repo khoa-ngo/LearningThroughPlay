@@ -8,6 +8,7 @@ import time
 import environments
 import numpy as np
 from gym import envs
+
 print(envs.registry.all())
 
 environment = gym.make('CartPole-v2')
@@ -16,9 +17,10 @@ observation = environment.reset()
 max_step = 20
 # render = True
 render = True
-totalreward=0
+totalreward = 0
 
-action_predetermined = [-123,-114,-108,-102,-95,-87,-81,-77,-72,-68,-65,-62,-60,-56,-54,-51,-48,-45,-42,-39,-36]
+action_predetermined = [-123, -114, -108, -102, -95, -87, -81, -77, -72, -68, -65, -62, -60, -56, -54, -51, -48, -45,
+                        -42, -39, -36]
 
 for step in range(max_step):
     if render:
