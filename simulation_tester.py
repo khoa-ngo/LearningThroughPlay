@@ -24,7 +24,6 @@ reward = 0
 done = False
 sum_reward_running = 0
 last_episode_reward = 0
-cumulative_reward = 0
 
 for i in range(episode_count):
     ob = env.reset()
@@ -32,7 +31,8 @@ for i in range(episode_count):
     sum_reward = 0
     for j in range(max_steps):
         # env.render()
-        action = agent.act(ob, reward, last_episode_reward, done)
+        action = agent.act(ob, reward, done)
+        print(action)
         # print(action)
         # sleep(0.1)
         ob, reward, done, _ = env.step(action)
