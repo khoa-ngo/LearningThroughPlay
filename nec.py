@@ -21,10 +21,10 @@ class EpisodicAgent(object):
 
         # options
         self.epsilon = 1.0  # probability of choosing a random action
-        self.epsilon_decay = 0.98  # decay of epsilon per episode
-        self.epsilon_min = 0
-        self.nnfind = 60  # how many nearest neighbors to consider in the policy?
-        self.mem_needed = 500  # amount of data to have before we can start exploiting
+        self.epsilon_decay = 0.98
+        self.epsilon_min = 0.0
+        self.nnfind = 50  # how many nearest neighbors to consider in the policy?
+        self.mem_needed = 100  # amount of data to have before we can start exploiting
         self.mem_size = 50000  # maximum size of memory
         self.gamma = 0.98  # discount factor
         self.expectation = 200
@@ -39,7 +39,7 @@ class EpisodicAgent(object):
         self.dbv = {}  # value function at all steps, computed retrospectively
         self.ep_start_pointer = 0
 
-    def act(self, observation, reward, done, happiness, discreet=True):
+    def act(self, observation, reward, done, performance, discreet=True):
         # assert isinstance(observation, np.ndarray) and observation.ndim == 1, 'unsupported observation type for now.'
 
         if self.db is None:
@@ -97,8 +97,9 @@ class EpisodicAgent(object):
             self.max_pointer = min(max(self.max_pointer, self.mem_pointer), self.mem_size)
 
             # decay exploration probability
-            self.epsilon *= (self.epsilon_decay + 1-(happiness / self.expectation)) / 2
-            print('epsilon: %f\tnew epsilon: %f' % (self.epsilon, 1-(happiness / self.expectation)))
+            # self.epsilon = 0.0
+            self.epsilon *= 1 - (performance / self.expectation)
+            print('epsilon: %f' % (self.epsilon))
 
             self.epsilon = max(self.epsilon, self.epsilon_min)  # cap at epsilon_min
 

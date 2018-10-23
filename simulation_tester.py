@@ -13,10 +13,9 @@ max_steps = 200
 reward = 0
 done = False
 sum_reward_running = 0
-last_episode_reward = 0
 happiness = 0
 
-noise = 0.01  # uniform
+noise = 0.0  # uniform
 
 for i in range(episode_count):
     ob = env.reset()
@@ -25,15 +24,17 @@ for i in range(episode_count):
     for j in range(max_steps):
         # env.render()
         action = agent.act(ob, reward, done, happiness, discreet=False)
-        action = action * (1 + np.random.rand() * noise)
+        action += (noise * ((np.random.random() - 0.5) * 2)) * action
         ob, reward, done, _ = env.step(action)
         ob = ob[2:]
         sum_reward += reward
         if done:
-            last_episode_reward = sum_reward_running
             break
     sum_reward_running = sum_reward_running * 0.5 + sum_reward * 0.5
     happiness = sum_reward_running
     print('%d\trunning reward: %f\treward: %f' % (i, sum_reward_running, sum_reward))
+    if sum_reward_running > 199.99:
+        print('no of episodes: %d ' % (i))
+        break
 
 env.close()
