@@ -39,7 +39,7 @@ class EpisodicAgent(object):
         self.dbv = {}  # value function at all steps, computed retrospectively
         self.ep_start_pointer = 0
 
-    def act(self, observation, reward, done, happiness):
+    def act(self, observation, reward, done, happiness, discreet=True):
         # assert isinstance(observation, np.ndarray) and observation.ndim == 1, 'unsupported observation type for now.'
 
         if self.db is None:
@@ -74,7 +74,8 @@ class EpisodicAgent(object):
             a = its[0][1]
 
         else:
-            a = self.action_space.sample()
+            if discreet: a = self.action_space.sample()
+            else: a = (np.random.rand()-0.5)*2
 
         # record move to database
         if self.mem_pointer < self.mem_size:
