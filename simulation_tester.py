@@ -16,13 +16,16 @@ sum_reward_running = 0
 last_episode_reward = 0
 happiness = 0
 
+noise = 0.01  # uniform
+
 for i in range(episode_count):
     ob = env.reset()
     ob = ob[2:]
     sum_reward = 0
     for j in range(max_steps):
         # env.render()
-        action = agent.act(ob, reward, done, happiness)
+        action = agent.act(ob, reward, done, happiness, discreet=False)
+        action = action * (1 + np.random.rand() * noise)
         ob, reward, done, _ = env.step(action)
         ob = ob[2:]
         sum_reward += reward

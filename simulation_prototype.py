@@ -5,11 +5,12 @@ import environments
 
 env = gym.make('CartPole-v2')
 env.reset()
-n = 1000
+n = 10000
 data = []
 
 for _ in range(n):
-    data.append(env.action_space.sample()[0])
+    data.append(env.action_space.sample())
 # print(data)
 data = pd.DataFrame(data=data)
-fig, axes = plt.subplots(nrows=2, ncols=2)
+data.hist()
+plt.show()
