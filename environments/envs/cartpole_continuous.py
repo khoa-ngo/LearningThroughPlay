@@ -188,10 +188,16 @@ class CartPoleEnv(gym.Env):
             self.viewer.close()
             self.viewer = None
 
-    def getRandomFloat(self, min, max):
-        val = (np.random.rand() - 0.5)   # generate random float (-0.5,0.5)
-        ret = val * (max-min) + self.mean((min, max))
-        return ret
+    def getRandomFloat(self, min, max, type="uniform"):
+        if min == max:
+            return min
+        else:
+            if type=="uniform":
+                val = (np.random.rand() - 0.5)   # generate random float, uniform (-0.5,0.5)
+                ret = val * (max - min) + self.mean((min, max))
+            if type == "normal":
+                ret = np.random.normal(loc=self.mean((min,max)), scale=max-min)
+            return ret
 
     def mean(self, numbers):
         return float(sum(numbers)) / max(len(numbers), 1)

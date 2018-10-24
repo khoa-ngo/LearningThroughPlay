@@ -18,11 +18,12 @@ happiness = 0
 
 
 def updateObNoise():
-    noise_level = 1
-    return np.array((core.getRandomFloat(1-noise_level, 1 + noise_level),
-                    core.getRandomFloat(1-noise_level, 1 + noise_level),
-                    core.getRandomFloat(1-noise_level, 1 + noise_level),
-                    core.getRandomFloat(1-noise_level, 1 + noise_level),))
+    noise_level = 0.2
+    return np.array((core.getRandomFloat(1-noise_level, 1 + noise_level, type="normal"),
+                    core.getRandomFloat(1-noise_level, 1 + noise_level, type="normal"),
+                    core.getRandomFloat(1-noise_level, 1 + noise_level, type="normal"),
+                    core.getRandomFloat(1-noise_level, 1 + noise_level, type="normal")
+                     ))
 
 
 action_noise = 0.15  # uniform
@@ -38,7 +39,7 @@ for i in range(episode_count):
         env.render()
         ob_new = np.array((ob[0], ob[1], math.degrees(ob[2]), math.degrees(ob[3])))
         action = p_distance * ob_new[0] + p_angle * ob_new[2] + p_rate * ob_new[3]
-        action = min(100, max(action, -100))
+        action = min(500, max(action, -500))
         action += (action_noise * ((np.random.random() - 0.5) * 2)) * action
         print(action)
         ob, reward, done, _ = env.step(action)
