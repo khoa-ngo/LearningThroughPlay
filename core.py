@@ -33,3 +33,11 @@ def isfloat(value):
     return True
   except ValueError:
     return False
+
+def getRandomFloat(min, max):
+  val = (np.random.rand() - 0.5)  # generate random float (-0.5,0.5)
+  ret = val * (max - min) + mean((min, max))
+  return ret
+
+def mean(numbers):
+  return float(sum(numbers)) / max(len(numbers), 1)

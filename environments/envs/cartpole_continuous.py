@@ -54,13 +54,14 @@ class CartPoleEnv(gym.Env):
         self.total_mass = (self.masspole + self.masscart)
         self.length = 0.12  # actually half the pole's length
         self.polemass_length = (self.masspole * self.length)
-        self.force_scalar = 150
-        self.force_mag = 0.04 * self.total_mass * self.force_scalar
+        self.force_scalar = 1
+        self.force_mag = 0.04 * self.total_mass
         self.tau = 0.01  # seconds between state updates
         self.kinematics_integrator = 'euler'
 
         # Angle at which to fail the episode
-        self.theta_threshold_radians = 90 * 2 * math.pi / 360
+        # self.theta_threshold_radians = 90 * 2 * math.pi / 360
+        self.theta_threshold_radians = math.radians(90)
         self.x_threshold = 5
 
         # Angle limit set to 2 * theta_threshold_radians so failing observation is still within bounds
@@ -125,19 +126,16 @@ class CartPoleEnv(gym.Env):
             self.steps_beyond_done += 1
             reward = 0.0
 
-        self.state_filtered = (x, x_dot, theta/(2*math.pi/360), theta_dot/(2*math.pi/360))
-        # print(self.state_filtered)
-        return np.array(self.state_filtered), reward, done, {}
+        return np.array(self.state), reward, done, {}
 
     def reset(self):
-        # self.state = np.array([0, 0, 0.12493066785, 1.53588974176])
-        # self.state_filtered = (0, 0, 0.12493066785 / (2 * math.pi / 360), 1.53588974176 / (2 * math.pi / 360))
-        # self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
-        self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
-        x, x_dot, theta, theta_dot = self.state
-        self.state_filtered = (x, x_dot, theta / (2 * math.pi / 360), theta_dot / (2 * math.pi / 360))
+        self.state = np.array((self.getRandomFloat(-0.3, 0.3),
+                              self.getRandomFloat(-0.3, 0.3),
+                              self.getRandomFloat(math.radians(-10), math.radians(10)),
+                              self.getRandomFloat(math.radians(-100), math.radians(100))
+                               ))
         self.steps_beyond_done = None
-        return np.array(self.state_filtered)
+        return np.array(self.state)
 
     def render(self, mode='human'):
         screen_width = 600
@@ -189,3 +187,11 @@ class CartPoleEnv(gym.Env):
         if self.viewer:
             self.viewer.close()
             self.viewer = None
+
+    def getRandomFloat(self, min, max):
+        val = (np.random.rand() - 0.5)   # generate random float (-0.5,0.5)
+        ret = val * (max-min) + self.mean((min, max))
+        return ret
+
+    def mean(self, numbers):
+        return float(sum(numbers)) / max(len(numbers), 1)
