@@ -99,7 +99,7 @@ class EpisodicAgent(object):
             # decay exploration probability
             # self.epsilon = 0.0
             self.epsilon *= 1 - (performance / self.expectation)
-            print('epsilon: %f' % (self.epsilon))
+            # print('epsilon: %f' % (self.epsilon))
 
             self.epsilon = max(self.epsilon, self.epsilon_min)  # cap at epsilon_min
 
