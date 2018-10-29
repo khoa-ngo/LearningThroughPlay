@@ -21,17 +21,17 @@ agent = EpisodicAgent(env.action_space)
 obs = env.reset()
 
 episode_count = 100
-max_steps = 300
+max_steps = 250
 reward = 0
 done = False
 running_reward = 0
 happiness = 0
-force_scalar = 300
+force_scalar = 200
 
 action_noise = 0.05  # uniform
 p_angle = 0
 p_rate = 0
-p_distance = 20
+p_distance = 0
 
 for i in range(episode_count):
     ob = env.reset()
@@ -40,7 +40,7 @@ for i in range(episode_count):
     ob = ob[2:]
     sum_reward = 0
     for j in range(max_steps):
-        if running_reward > 290:
+        if running_reward > max_steps-1:
             env.render()
         action = agent.act(ob, reward, done, happiness, discreet=False)  # agent action
         action *= core.getRandomFloat(1 - action_noise, 1 + action_noise, type="normal")  # action noise
@@ -58,7 +58,7 @@ for i in range(episode_count):
     running_reward = running_reward * 0.5 + sum_reward * 0.5
     happiness = running_reward
     print('%d\trunning reward: %f\treward: %f' % (i, running_reward, sum_reward))
-    if running_reward > 299:
+    if running_reward > max_steps-0.5:
         print('no of episodes: %d ' % (i))
         break
 

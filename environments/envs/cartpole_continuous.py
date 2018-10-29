@@ -132,7 +132,7 @@ class CartPoleEnv(gym.Env):
         self.state = np.array((self.getRandomFloat(-0.3, 0.3),
                               self.getRandomFloat(-0.3, 0.3),
                               self.getRandomFloat(math.radians(-10), math.radians(10)),
-                              self.getRandomFloat(math.radians(-100), math.radians(100))
+                              self.getRandomFloat(math.radians(-70), math.radians(70))
                                ))
         self.steps_beyond_done = None
         return np.array(self.state)

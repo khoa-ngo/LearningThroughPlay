@@ -23,7 +23,7 @@ class EpisodicAgent(object):
         self.epsilon = 1.0  # probability of choosing a random action
         # self.epsilon_decay = 0.3
         self.epsilon_min = 0.0
-        self.nnfind = 50  # how many nearest neighbors to consider in the policy?
+        self.nnfind = 40  # how many nearest neighbors to consider in the policy?
         self.mem_needed = 100  # amount of data to have before we can start exploiting
         self.mem_size = 50000  # maximum size of memory
         self.gamma = 0.98  # discount factor
@@ -98,7 +98,7 @@ class EpisodicAgent(object):
 
             # decay exploration probability
             # self.epsilon = 0.0
-            self.epsilon *= 1 - (performance / self.expectation)
+            self.epsilon *= (1 - (performance / self.expectation))
             # self.epsilon *= self.epsilon_decay
             # print('epsilon: %f' % (self.epsilon))
 
